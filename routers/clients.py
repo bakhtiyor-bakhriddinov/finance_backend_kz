@@ -19,10 +19,17 @@ clients_router = APIRouter()
 
 @clients_router.get("/clients", response_model=Page[Clients])
 async def get_client_list(
+        phone: Optional[str] = None,
+        tg_id: Optional[int] = None,
         db: AsyncSession = Depends(get_db),
         current_user: dict = Depends(PermissionChecker(required_permissions={"Clients": ["read"]}))
 ):
-    objs = await ClientDAO.get_all(session=db)
+    data = {
+        "phone": phone,
+        "tg_id": tg_id
+    }
+    filtered_data = {k: v for k, v in data.items() if v is not None}
+    objs = await ClientDAO.get_all(session=db, filters=filtered_data)
     return paginate(objs)
 
 
