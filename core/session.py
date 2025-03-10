@@ -25,8 +25,8 @@ async def create_sequence():
             )
 
 
-# Run the async setup
-asyncio.run(create_sequence())
+# # Run the async setup
+# asyncio.run(create_sequence())
 
 
 async def get_db():

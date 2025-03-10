@@ -3,7 +3,7 @@ from contextlib import asynccontextmanager
 import pytz
 
 from core.config import settings
-from core.session import async_session_maker
+from core.session import async_session_maker, create_sequence
 from dal.dao import PermissionGroupDAO, PermissionDAO, RoleDAO, AccessDAO, UserDAO
 from utils.permissions import permission_groups
 from utils.utils import Hasher
@@ -101,7 +101,7 @@ async def create_role_lifespan():
 
 @asynccontextmanager
 async def combined_lifespan(app):
-    async with create_permissions_lifespan(), create_role_lifespan():
+    async with create_permissions_lifespan(), create_role_lifespan(), create_sequence():
         print("Started tasks ...")
         #-----------   BEFORE YIELD WHEN STARTING UP ALL THE FUNCTIONS WORK ---------
         yield
