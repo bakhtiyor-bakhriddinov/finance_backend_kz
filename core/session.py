@@ -1,7 +1,7 @@
 from contextlib import asynccontextmanager
 from typing import Generator, AsyncGenerator
 import asyncio
-from sqlalchemy import Sequence
+from sqlalchemy import Sequence, text
 from sqlalchemy.ext.asyncio import create_async_engine, AsyncSession, async_sessionmaker
 # from sqlalchemy.orm import sessionmaker
 from core.config import settings
@@ -23,7 +23,7 @@ async def create_sequence():
     async with async_session_maker() as session:
         async with session.begin():  # ✅ Use session.begin() inside an async session
             await session.execute(
-                "CREATE SEQUENCE IF NOT EXISTS serial_number_seq START 1 INCREMENT 1;"
+                text("CREATE SEQUENCE IF NOT EXISTS serial_number_seq START 1 INCREMENT 1;")
             )
     yield
 
