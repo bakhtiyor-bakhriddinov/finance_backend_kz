@@ -25,14 +25,14 @@ async def create_request(
         current_user: dict = Depends(PermissionChecker(required_permissions={"Requests": ["create"]}))
 ):
     body_dict = body.model_dump(exclude_unset=True)
+    print("body_dict: ", body_dict)
     body_dict.pop("file_paths", None)
     body_dict.pop("contract", None)
+    print("body_dict: ", body_dict)
     created_request = await RequestDAO.add(session=db, **body.model_dump())
 
     if body.file_paths is not None and body.contract is not None:
-        contract = None
-        if body.contract is not None:
-            contract = await ContractDAO.add(session=db, **{"request_id": created_request.id})
+        contract = await ContractDAO.add(session=db, **{"request_id": created_request.id})
 
         await FileDAO.add(
             session=db,
