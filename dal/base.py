@@ -20,9 +20,9 @@ class BaseDAO:
             await session.flush()
             await session.refresh(new_instance)
             return new_instance
-        except SQLAlchemyError:
+        except SQLAlchemyError as e:
             await session.rollback()
-            # print(e)
+            print("SQLAlchemyError: ", e)
             return None
 
 
