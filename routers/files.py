@@ -1,22 +1,16 @@
 import os
 from datetime import datetime
-from typing import List, Optional
+from typing import List
 
 from fastapi import APIRouter, UploadFile
 from fastapi import Depends, File
-from sqlalchemy.ext.asyncio import AsyncSession
 
-from core.session import get_db
-from dal.dao import InvoiceDAO, ContractDAO, FileDAO
-from schemas.files import CreateFile, GetFile
 from utils.utils import PermissionChecker
-
-
 
 files_router = APIRouter()
 
 
-@files_router.post("/files/upload", response_model=GetFile)
+@files_router.post("/files/upload")
 async def upload_files(
         files: List[UploadFile] = File(...),
         # db: AsyncSession = Depends(get_db),
