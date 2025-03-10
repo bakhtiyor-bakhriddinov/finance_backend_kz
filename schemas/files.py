@@ -7,9 +7,9 @@ from schemas.base_model import TunedModel
 
 
 class GetFile(TunedModel):
-    id: UUID
-    file_paths: List[str]
-    created_at: datetime
+    id: Optional[UUID] = None
+    file_paths: Optional[List[str]] = None
+    created_at: Optional[datetime] = None
 
 
 class CreateFile(TunedModel):
