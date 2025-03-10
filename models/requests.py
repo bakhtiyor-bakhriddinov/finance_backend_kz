@@ -1,16 +1,16 @@
 import uuid
 
-from sqlalchemy import Column, ForeignKey, DateTime, func, Boolean, UUID, DECIMAL, Text, BIGINT
-from sqlalchemy import Integer, String
+from sqlalchemy import Column, ForeignKey, DateTime, func, Boolean, UUID, DECIMAL, Text, Integer, BIGINT, String, Sequence
 from sqlalchemy.orm import relationship
 
 from core.base import Base
 
+serial_seq = Sequence('serial_number_seq')  # Create a sequence
 
 class Requests(Base):
     __tablename__ = 'requests'
     id = Column(UUID, primary_key=True, default=uuid.uuid4)
-    number = Column(BIGINT, autoincrement=True)
+    number = Column(BIGINT, serial_seq, server_default=serial_seq.next_value(), unique=True, nullable=False)
     sum = Column(DECIMAL, nullable=False)
     sap_code = Column(String)
     approved = Column(Boolean, default=False)
