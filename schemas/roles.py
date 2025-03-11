@@ -27,8 +27,8 @@ class CreateRole(TunedModel):
 
 class UpdateRole(TunedModel):
     id: UUID
-    name: Optional[str]
-    description: Optional[str]
-    is_active: Optional[bool]
+    name: Optional[str] = None
+    description: Optional[str] = None
+    is_active: Optional[bool] = None
     permissions: Optional[List[UUID]] = None
 
