@@ -102,7 +102,6 @@ class BaseDAO:
                 query = (
                     select(cls.model)
                     .where(cls.model.id == obj_id)
-                    .returning(cls.model)
                 )
             result = await session.execute(query)
 
