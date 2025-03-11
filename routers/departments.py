@@ -35,8 +35,8 @@ async def get_department_list(
     data = {
         "name": name
     }
-    filtered_data = {k: v for k, v in data.items() if v is not None}
-    departments = await DepartmentDAO.get_all(session=db, filters=filtered_data if filtered_data else None)
+    # filtered_data = {k: v for k, v in data.items() if v is not None}
+    departments = await DepartmentDAO.get_all(session=db, filters=data)
     return paginate(departments)
 
 

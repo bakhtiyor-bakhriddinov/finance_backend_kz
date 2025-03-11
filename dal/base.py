@@ -75,13 +75,11 @@ class BaseDAO:
             query = select(cls.model)
             if filters is not None:
                 # query = query.filter_by(**filters)
-                conditions = [getattr(cls.model, k) == v for k, v in filters.items()]
+                conditions = [getattr(cls.model, k) == v for k, v in filters.items() if v is not None]
                 query = query.filter(and_(*conditions))
 
             result = await session.execute(query)
             return result.scalars().unique().fetchall()
-            # return result.scalars().unique()
-            # return result.scalars().fetchall()
 
         except SQLAlchemyError as e:
             print(e)
