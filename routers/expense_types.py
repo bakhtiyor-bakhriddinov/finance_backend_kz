@@ -37,8 +37,8 @@ async def get_expense_type_list(
     data = {
         "name": name
     }
-    # filtered_data = {k: v for k, v in data.items() if v is not None}
-    objs = await ExpenseTypeDAO.get_all(session=db, filters=data)
+    filtered_data = {k: v for k, v in data.items() if v is not None}
+    objs = await ExpenseTypeDAO.get_all(session=db, filters=filtered_data)
     return objs
 
 

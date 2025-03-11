@@ -15,6 +15,7 @@ if settings.DB_URL is None:
 
 engine = create_async_engine(settings.DB_URL, future=True, echo=True)
 async_session_maker = async_sessionmaker(engine, expire_on_commit=False, class_=AsyncSession)
+loop = asyncio.get_event_loop_policy().get_event_loop()
 
 
 @asynccontextmanager
@@ -32,11 +33,18 @@ async def create_sequence():
 # asyncio.run(create_sequence())
 
 
+# async def get_db():
+#     session: AsyncSession = async_session_maker()
+#     try:
+#         yield session
+#     finally:
+#         await session.close()
+
+
+
 async def get_db():
-    session: AsyncSession = async_session_maker()
-    try:
-        yield session
-    finally:
+    async with async_session_maker() as session:
+        yield session  # Ensure session is properly yielded
         await session.close()
 
 
