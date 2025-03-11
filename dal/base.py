@@ -75,7 +75,7 @@ class BaseDAO:
             query = select(cls.model)
             if filters is not None:
                 # query = query.filter_by(**filters)
-                conditions = [getattr(cls.model, k) == v for k, v in filters.items() if v is not None]
+                conditions = [getattr(cls.model, k) == v for k, v in filters.items()]
                 query = query.filter(and_(*conditions))
 
             result = await session.execute(query)

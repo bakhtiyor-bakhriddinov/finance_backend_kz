@@ -32,11 +32,11 @@ async def get_department_list(
         db: AsyncSession = Depends(get_db),
         current_user: dict = Depends(PermissionChecker(required_permissions={"Departments": ["read"]}))
 ):
-    data = {
-        "name": name
-    }
+    filters = {}
+    if name is not None:
+        filters["name"] = name
     # filtered_data = {k: v for k, v in data.items() if v is not None}
-    departments = await DepartmentDAO.get_all(session=db, filters=data)
+    departments = await DepartmentDAO.get_all(session=db, filters=filters)
     return paginate(departments)
 
 
