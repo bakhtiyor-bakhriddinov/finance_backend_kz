@@ -66,7 +66,7 @@ async def update_role(
         current_user: dict = Depends(PermissionChecker(required_permissions={"Roles": ["update"]}))
 ):
     permissions = body.permissions
-    body_dict = body.model_dump()
+    body_dict = body.model_dump(exclude_unset=True)
     body_dict.pop("permissions", None)
     updated_role = await RoleDAO.update(session=db, data=body_dict)
     if permissions is not None:

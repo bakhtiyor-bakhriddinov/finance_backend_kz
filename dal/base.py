@@ -91,14 +91,21 @@ class BaseDAO:
 
             if obj_id is None:
                 raise ValueError("update_data must contain an 'id' key.")
-
-            query = (
-                update(cls.model)
-                .where(cls.model.id == obj_id)
-                .values(**data)
-                .returning(cls.model)
-            )
+            if data:
+                query = (
+                    update(cls.model)
+                    .where(cls.model.id == obj_id)
+                    .values(**data)
+                    .returning(cls.model)
+                )
+            else:
+                query = (
+                    select(cls.model)
+                    .where(cls.model.id == obj_id)
+                    .returning(cls.model)
+                )
             result = await session.execute(query)
+
             # await session.commit()
             await session.flush()
             instance = result.scalars().first()  # Get the updated instance
