@@ -13,7 +13,7 @@ class Suppliers(Base):
     name = Column(String, unique=True, nullable=False)
     description = Column(String)
     is_active = Column(Boolean, default=True)
-    requests = relationship('Requests', back_populates='supplier', passive_deletes=True)  # lazy="joined"
+    requests = relationship('Requests', back_populates='supplier', passive_deletes=True, lazy='noload')
     created_at = Column(DateTime(timezone=True), default=func.now())
     updated_at = Column(DateTime(timezone=True), onupdate=func.now())
 

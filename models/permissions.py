@@ -12,8 +12,8 @@ class Permissions(Base):
     name = Column(String, nullable=False)
     action = Column(String, unique=True)
     group_id = Column(UUID, ForeignKey('permission_groups.id', ondelete="CASCADE"), nullable=False)
-    group = relationship("PermissionGroups", back_populates='permissions')  # lazy="joined"
+    group = relationship("PermissionGroups", back_populates='permissions', lazy='select')
     is_active = Column(Boolean, default=True)
-    accesses = relationship("Accesses", back_populates="permission", cascade="all, delete")  # lazy="joined"
+    accesses = relationship("Accesses", back_populates="permission", cascade="all, delete", lazy='select')
     created_at = Column(DateTime(timezone=True), default=func.now())
     updated_at = Column(DateTime(timezone=True), onupdate=func.now())
