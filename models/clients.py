@@ -15,7 +15,7 @@ class Clients(Base):
     language = Column(String)
     phone = Column(String)
     is_active = Column(Boolean, default=True)
-    requests = relationship('Requests', back_populates='client', lazy="joined", passive_deletes=True)
+    requests = relationship('Requests', back_populates='client', passive_deletes=True) # lazy="joined"
     created_at = Column(DateTime(timezone=True), default=func.now())
     updated_at = Column(DateTime(timezone=True), onupdate=func.now())
 

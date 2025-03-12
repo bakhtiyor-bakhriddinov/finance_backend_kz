@@ -21,21 +21,21 @@ class Requests(Base):
     comment = Column(Text)
     payer_company = Column(String)
     status = Column(Integer)
-    contract = relationship('Contracts', back_populates='request', uselist=False, lazy="joined", passive_deletes=True)
-    invoice = relationship('Invoices', back_populates='request', uselist=False, lazy="joined", passive_deletes=True)
+    contract = relationship('Contracts', back_populates='request', uselist=False, passive_deletes=True)  # lazy="joined"
+    invoice = relationship('Invoices', back_populates='request', uselist=False, passive_deletes=True)  # lazy="joined"
     client_id = Column(UUID, ForeignKey("clients.id", ondelete="SET NULL"))
-    client = relationship('Clients', back_populates='requests', lazy="joined")
+    client = relationship('Clients', back_populates='requests')  # lazy="joined"
     department_id = Column(UUID, ForeignKey("departments.id", ondelete="SET NULL"))
-    department = relationship('Departments', back_populates='requests')
+    department = relationship('Departments', back_populates='requests')  # lazy="joined"
     expense_type_id = Column(UUID, ForeignKey("expense_types.id", ondelete="SET NULL"))
-    expense_type = relationship('ExpenseTypes', back_populates='requests')
+    expense_type = relationship('ExpenseTypes', back_populates='requests')  # lazy="joined"
     payment_type_id = Column(UUID, ForeignKey("payment_types.id", ondelete="SET NULL"))
-    payment_type = relationship('PaymentTypes', back_populates='requests', lazy="joined")
+    payment_type = relationship('PaymentTypes', back_populates='requests')  # lazy="joined"
     buyer_id = Column(UUID, ForeignKey("buyers.id", ondelete="SET NULL"))
-    buyer = relationship('Buyers', back_populates='requests', lazy="joined")
+    buyer = relationship('Buyers', back_populates='requests')  # lazy="joined"
     supplier_id = Column(UUID, ForeignKey("suppliers.id", ondelete="SET NULL"))
-    supplier = relationship('Suppliers', back_populates='requests', lazy="joined")
-    logs = relationship('Logs', back_populates='request', lazy="joined", cascade="all, delete")
+    supplier = relationship('Suppliers', back_populates='requests')  # lazy="joined"
+    logs = relationship('Logs', back_populates='request', cascade="all, delete")  # lazy="joined"
     created_at = Column(DateTime(timezone=True), default=func.now())
     updated_at = Column(DateTime(timezone=True), onupdate=func.now())
 
