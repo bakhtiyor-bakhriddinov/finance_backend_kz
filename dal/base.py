@@ -10,7 +10,7 @@ class BaseDAO:
     model = None  # Устанавливается в дочернем классе
 
     @classmethod
-    def add(cls, session: Session, **values):
+    async def add(cls, session: Session, **values):
         # Добавить одну запись
         new_instance = cls.model(**values)
         session.add(new_instance)
@@ -26,7 +26,7 @@ class BaseDAO:
 
 
     @classmethod
-    def add_many(cls, session: Session, instances: List[Dict[str, Any]]):
+    async def add_many(cls, session: Session, instances: List[Dict[str, Any]]):
         new_instances = [cls.model(**values) for values in instances]
         session.add_all(new_instances)
         try:
@@ -41,7 +41,7 @@ class BaseDAO:
 
 
     @classmethod
-    def get_by_attributes(cls, session: Session, filters: Dict[str, Any] = None, first: bool = False):
+    async def get_by_attributes(cls, session: Session, filters: Dict[str, Any] = None, first: bool = False):
         """
         Retrieves records filtered by given attributes.
 
@@ -63,7 +63,7 @@ class BaseDAO:
 
 
     @classmethod
-    def get_all(cls, session: Session, filters: dict = None):
+    async def get_all(cls, session: Session, filters: dict = None):
         try:
             query = select(cls.model)
             if filters is not None:
@@ -80,7 +80,7 @@ class BaseDAO:
 
 
     @classmethod
-    def update(cls, session: Session, data):
+    async def update(cls, session: Session, data):
         try:
             obj_id = data.pop("id", None)  # Extract `id` from the dictionary
 
@@ -115,7 +115,7 @@ class BaseDAO:
 
 
     @classmethod
-    def delete(cls, session: Session, filters: dict):
+    async def delete(cls, session: Session, filters: dict):
         try:
             query = (
                 delete(cls.model)
@@ -125,7 +125,8 @@ class BaseDAO:
             result = session.execute(query)
             # await session.commit()
             session.flush()
-            deleted_objects = result.scalars().unique().all()
+            # deleted_objects = result.scalars().unique().all()
+            deleted_objects = result.scalars().all()
             return deleted_objects
 
         except SQLAlchemyError as e:

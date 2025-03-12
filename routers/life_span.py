@@ -25,16 +25,16 @@ async def create_permissions_lifespan():
 
     with get_session() as session:
         for key, value in permission_groups.items():
-            permission_group = PermissionGroupDAO.add(session=session, **{"name": key})
+            permission_group = await PermissionGroupDAO.add(session=session, **{"name": key})
             print("created permission_group: ", permission_group)
             if permission_group is not None:
                 permission_group_id = permission_group.id
 
                 for name, action in value.items():
-                    permission = PermissionDAO.get_by_attributes(session=session, filters={"group_id": permission_group_id, "name": name}, first=True)
+                    permission = await PermissionDAO.get_by_attributes(session=session, filters={"group_id": permission_group_id, "name": name}, first=True)
                     print("permission: ", permission)
                     if permission is None:
-                        created_permission = PermissionDAO.add(session=session, **{"name": name, "action": action, "group_id": permission_group_id})
+                        created_permission = await PermissionDAO.add(session=session, **{"name": name, "action": action, "group_id": permission_group_id})
                         print("created permission: ", created_permission)
 
                 session.commit()
@@ -53,10 +53,10 @@ async def create_role_lifespan():
             session.close()
 
     with get_session() as session:
-        role = RoleDAO.get_by_attributes(session=session, filters={"name": settings.admin_role, "description": 'Superuser'}, first=True)
+        role = await RoleDAO.get_by_attributes(session=session, filters={"name": settings.admin_role, "description": 'Superuser'}, first=True)
         print("ROLE: ", role)
         if not role:
-            role = RoleDAO.add(session=session, **{"name": settings.admin_role, "description": 'Superuser'})
+            role = await RoleDAO.add(session=session, **{"name": settings.admin_role, "description": 'Superuser'})
 
         if role is not None:
             role_id = role.id
@@ -68,10 +68,10 @@ async def create_role_lifespan():
             for key, value in permission_groups.items():
                 for name, action in value.items():
                     if action not in role_permissions:
-                        permission = PermissionDAO.get_by_attributes(session=session, filters={"action": action}, first=True)
+                        permission = await PermissionDAO.get_by_attributes(session=session, filters={"action": action}, first=True)
                         print("Permission: ", permission.action)
                         if permission is not None:
-                            AccessDAO.add(session=session, **{"permission_id": permission.id, "role_id": role_id})
+                            await AccessDAO.add(session=session, **{"permission_id": permission.id, "role_id": role_id})
                             session.commit()
 
 
