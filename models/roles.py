@@ -14,7 +14,7 @@ class Roles(Base):
     description = Column(String)
     is_active = Column(Boolean, default=True)
     accesses = relationship("Accesses", back_populates="role", cascade="all, delete", lazy='select')
-    users = relationship('Users', back_populates='role', passive_deletes=True, lazy='noload')
+    users = relationship('Users', back_populates='role', passive_deletes=True, lazy='select')
     created_at = Column(DateTime(timezone=True), default=func.now())
     updated_at = Column(DateTime(timezone=True), onupdate=func.now())
 

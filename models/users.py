@@ -23,7 +23,7 @@ class Users(Base):
     role_id = Column(UUID, ForeignKey("roles.id", ondelete="SET NULL"))
     role = relationship('Roles', back_populates='users', lazy='selectin')
     department = relationship('Departments', back_populates='head', uselist=False, passive_deletes=True, lazy='select')
-    logs = relationship('Logs', back_populates='user', passive_deletes=True, lazy='noload')
+    logs = relationship('Logs', back_populates='user', passive_deletes=True, lazy='select')
     created_at = Column(DateTime(timezone=True), default=func.now())
     updated_at = Column(DateTime(timezone=True), onupdate=func.now())
 
