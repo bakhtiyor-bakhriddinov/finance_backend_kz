@@ -47,6 +47,7 @@ class CreateRequest(TunedModel):
     expense_type_id: UUID
     buyer_id: UUID
     supplier_id: UUID
+    client_id: UUID
     description: Optional[str] = None
     status: Optional[int] = 0
     sum: float
