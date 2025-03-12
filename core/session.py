@@ -42,10 +42,10 @@ async def create_sequence():
 
 
 
-async def get_db():
+async def get_db() -> AsyncSession:
     async with async_session_maker() as session:
         yield session  # Ensure session is properly yielded
-        await session.close()
+        # await session.close()
 
 
 
