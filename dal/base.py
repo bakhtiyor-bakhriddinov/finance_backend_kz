@@ -1,5 +1,5 @@
 from typing import List, Any, Dict
-from sqlalchemy import select, inspect, update, delete, and_, in_
+from sqlalchemy import select, inspect, update, delete, and_
 from sqlalchemy.exc import SQLAlchemyError
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import joinedload, Session
