@@ -14,7 +14,7 @@ files_router = APIRouter()
 async def upload_files(
         files: List[UploadFile] = File(...),
         # db: Session = Depends(get_db),
-        current_user: dict = Depends(PermissionChecker(required_permissions={"Files": ["read"]}))
+        current_user: dict = Depends(PermissionChecker(required_permissions={"Files": ["create"]}))
 ):
     base_dir = "files"
     date_dir = datetime.now().strftime("%Y/%m/%d")  # Create a path like "2025/03/10"
