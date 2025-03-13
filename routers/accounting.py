@@ -25,7 +25,7 @@ async def get_statistics(
     filters = {
         "payment_type_id": "88a747c1-5616-437c-ac71-a02b30287ee8",
         "payment_time": None,
-        # "status": 4
+        "status": 4
     }
 
     query = await RequestDAO.get_all(
