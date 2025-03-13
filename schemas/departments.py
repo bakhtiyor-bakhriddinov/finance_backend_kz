@@ -12,11 +12,11 @@ class Departments(TunedModel):
     id: UUID
     name: str
     is_active: Optional[bool]
+    head: Optional[GetUsers] = None
     created_at: Optional[datetime]
 
 
 class Department(Departments):
-    head: Optional[GetUsers] = None
     updated_at: Optional[datetime] = None
 
 
