@@ -1,5 +1,5 @@
 from typing import List, Any, Dict
-from sqlalchemy import select, inspect, update, delete, and_
+from sqlalchemy import select, inspect, update, delete, and_, in_
 from sqlalchemy.exc import SQLAlchemyError
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import joinedload, Session
@@ -67,11 +67,23 @@ class BaseDAO:
         try:
             query = select(cls.model)
             if filters is not None:
-                conditions = [
-                    getattr(cls.model, k).in_(v) if k == "status" else getattr(cls.model, k) == v
-                    for k, v in filters.items()
-                ]
-                query = query.filter(and_(*conditions))
+                # conditions = [
+                #     getattr(cls.model, k).in_(v) if k == "status" else getattr(cls.model, k) == v
+                #     for k, v in filters.items()
+                # ]
+                # query = query.filter(and_(*conditions))
+
+                conditions = []
+                for k, v in filters.items():
+                    column = getattr(cls.model, k, None)
+                    if column is not None:
+                        if isinstance(v, list):  # If value is a list, use IN
+                            conditions.append(column.in_(v))
+                        else:
+                            conditions.append(column == v)
+
+                if conditions:
+                    query = query.filter(and_(*conditions))  # Apply all conditions
 
             # result = session.execute(query)
             # return result.scalars().all()
