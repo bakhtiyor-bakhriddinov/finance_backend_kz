@@ -1,19 +1,13 @@
 from datetime import datetime, date
-from typing import Optional, List
-from uuid import UUID
 
 from fastapi import APIRouter, Depends
-from fastapi_pagination import Page, paginate
 from sqlalchemy import and_, func
-from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import Session
 from sqlalchemy.sql.functions import coalesce
 
 from core.session import get_db
-from dal.dao import RequestDAO, InvoiceDAO, ContractDAO, FileDAO, LogDAO
-from schemas.requests import Requests, Request, UpdateRequest, CreateRequest
+from dal.dao import RequestDAO
 from utils.utils import PermissionChecker
-
 
 
 statistics_router = APIRouter()

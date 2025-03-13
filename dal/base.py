@@ -69,12 +69,6 @@ class BaseDAO:
         try:
             query = select(cls.model)
             if filters is not None:
-                # conditions = [
-                #     getattr(cls.model, k).in_(v) if k == "status" else getattr(cls.model, k) == v
-                #     for k, v in filters.items()
-                # ]
-                # query = query.filter(and_(*conditions))
-
                 conditions = []
                 for k, v in filters.items():
                     if k == "status":
@@ -87,8 +81,12 @@ class BaseDAO:
 
                     if column is not None:
                         # if isinstance(v, list):  # If value is a list, use IN
-                        if k == "status":  # If value is a list, use IN
+                        if k == "status" and isinstance(v, list):
                             conditions.append(column.in_(v))
+                        elif k == "status":
+                            conditions.append(column != v)
+                        elif k == "payment_time":
+                            conditions.append(column.isnot(v))
 
                         # elif k == "created_at_start" or k == "created_at_finish":
                         #     if k == "created_at_start":
