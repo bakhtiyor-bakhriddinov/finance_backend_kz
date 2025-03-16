@@ -160,7 +160,7 @@ async def status_updater():
     # trigger = CronTrigger(
     #     hour=11, minute=30, second=00, timezone=timezonetash
     # )
-    trigger = IntervalTrigger(minutes=1)
+    trigger = IntervalTrigger(hours=1)
     job_scheduler.add_job(run_async_job, trigger=trigger, id='update_request_status')
 
 
