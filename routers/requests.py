@@ -153,6 +153,10 @@ async def update_request(
                 "invoice_id": invoice.id if invoice is not None else None
             }
         )
+
+    db.commit()
+    db.refresh(updated_request)
+
     if body.status is not None:
         # create logs
         await LogDAO.add(
@@ -196,6 +200,4 @@ async def update_request(
                         f"“{updated_request.comment}”")
         send_telegram_message(chat_id=updated_request.client.tg_id, message_text=message_text)
 
-    db.commit()
-    db.refresh(updated_request)
     return updated_request
