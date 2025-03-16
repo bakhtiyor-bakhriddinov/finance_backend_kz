@@ -7,12 +7,11 @@ from fastapi_pagination import Page, paginate
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import Session
 
+from core.config import settings
 from core.session import get_db
 from dal.dao import RequestDAO, InvoiceDAO, ContractDAO, FileDAO, LogDAO
 from schemas.requests import Requests, Request, UpdateRequest, CreateRequest
-from utils.utils import PermissionChecker
-
-
+from utils.utils import PermissionChecker, send_telegram_message
 
 requests_router = APIRouter()
 
@@ -139,6 +138,7 @@ async def update_request(
     body_dict = body.model_dump(exclude_unset=True)
     body_dict.pop("file_paths", None)
     body_dict.pop("invoice", None)
+    old_request = await RequestDAO.get_by_attributes(session=db, filters={"id": body.id}, first=True)
     updated_request = await RequestDAO.update(session=db, data=body_dict)
 
     if body.file_paths is not None and body.invoice is not None:
@@ -163,6 +163,38 @@ async def update_request(
                 "user_id": current_user["id"]
             }
         )
+        message_text = ""
+        inline_keyboard = None
+        status = updated_request.status
+        number = updated_request.number
+        if status == 0: # Новый
+            message_text = (f"Ваша заявка #{number}s принята со стороны  финансового отдела.\n"
+                            f"Срок оплаты {updated_request.payment_time.strftime('%d.%m.%Y')}")
+        elif status == 4: # Отменен
+            message_text = (f"Ваша заявка #{number}s отменена по причине:\n"
+                            f"{updated_request.comment}")
+        elif status == 5: # Обработан
+            message_text = (f"Оплата по вашей заявке #{number}s проведена.\n"
+                            f"Документ оплаты: “квиток фото”")
+            inline_keyboard = {
+                "inline_keyboard": [
+                    [
+                        {
+                            "text": "Посмотреть фото",
+                            "url": f"{settings.BASE_URL}{updated_request.invoice.file.file_paths if updated_request.invoice else ''}"
+                        }
+                    ]
+                ]
+            }
+
+        send_telegram_message(chat_id=updated_request.client.tg_id, message_text=message_text, keyboard=inline_keyboard)
+
+    if body.payment_time is not None:
+        message_text = (f"Срок оплаты по вашей заявке изменен с {old_request.payment_time.strftime('%d.%m.%Y')} на "
+                        f"{updated_request.payment_time.strftime('%d.%m.%Y')} по причине:\n"
+                        f"“{updated_request.comment}”")
+        send_telegram_message(chat_id=updated_request.client.tg_id, message_text=message_text)
+
     db.commit()
     db.refresh(updated_request)
     return updated_request

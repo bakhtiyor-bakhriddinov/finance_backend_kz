@@ -1,4 +1,8 @@
+import json
 from datetime import datetime, timedelta
+from typing import Optional
+
+import requests
 from fastapi import Depends, HTTPException, status, Security
 from fastapi.security import OAuth2PasswordBearer
 from jose import JWTError, jwt
@@ -102,7 +106,7 @@ class PermissionChecker:
 
 
 
-async def get_me(token: str = Depends(reuseable_oauth), session: AsyncSession = Depends(get_db)):
+async def get_me(token: str = Depends(reuseable_oauth), session: Session = Depends(get_db)):
     try:
         payload = jwt.decode(token, settings.SECRET_KEY, algorithms=[settings.ALGORITHM])
         username = payload.get('sub')
@@ -122,3 +126,26 @@ async def get_me(token: str = Depends(reuseable_oauth), session: AsyncSession = 
         raise CREDENTIALS_EXCEPTION
 
     return user_obj
+
+
+def send_telegram_message(chat_id, message_text, keyboard: Optional[dict] = None):
+    # Create the request payload
+    payload = {
+        "chat_id": chat_id,
+        "text": message_text,
+        "parse_mode": "HTML"
+    }
+    if keyboard:
+        payload['reply_markup'] = json.dumps(keyboard)
+
+    # Send the request to send the inline keyboard message
+    response = requests.post(
+        url=f"https://api.telegram.org/bot{settings.BOT_TOKEN}/sendMessage",
+        json=payload
+    )
+    # Check the response status
+    if response.status_code == 200:
+        return response
+    else:
+        return None
+

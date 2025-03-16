@@ -1,16 +1,39 @@
 from contextlib import asynccontextmanager, contextmanager
+from datetime import datetime
 
 import pytz
-from sqlalchemy.ext.asyncio import AsyncSession
+from apscheduler.schedulers.background import BackgroundScheduler
+from apscheduler.triggers.cron import CronTrigger
+from apscheduler.triggers.interval import IntervalTrigger
+from fastapi import Depends
 from sqlalchemy.orm import Session
 
 from core.config import settings
-from core.session import session_maker, create_sequence
-from dal.dao import PermissionGroupDAO, PermissionDAO, RoleDAO, AccessDAO, UserDAO
+from core.session import session_maker, create_sequence, get_db
+from dal.dao import PermissionGroupDAO, PermissionDAO, RoleDAO, AccessDAO, UserDAO, RequestDAO
 from utils.permissions import permission_groups
 from utils.utils import Hasher
 
+
 timezonetash = pytz.timezone('Asia/Tashkent')
+
+
+
+scheduler = BackgroundScheduler()
+
+if not scheduler.running:
+    print("🚀 Starting scheduler...")
+    scheduler.start()  # ✅ Start only once
+
+
+# scheduler_lock = threading.Lock()
+
+
+
+
+def get_scheduler():
+    return scheduler
+
 
 
 
@@ -90,9 +113,35 @@ async def create_role_lifespan():
 
 
 
+async def request_status_update(db: Session = Depends(get_db)):
+    today = datetime.now(tz=timezonetash).date()
+    query = await RequestDAO.get_all(session=db, filters={"status": 1, "payment_time": today})
+    requests = db.execute(query).scalars().all()
+    for request in requests:
+        # time.sleep(1)
+        await RequestDAO.update(session=db, data={"id": request.id, "status": 2})
+
+
+
+
+async def status_updater():
+    job_scheduler: BackgroundScheduler = get_scheduler()
+    # trigger = CronTrigger(
+    #     hour=11, minute=30, second=00, timezone=timezonetash
+    # )
+    trigger = IntervalTrigger(minutes=10)
+    job_scheduler.add_job(request_status_update, trigger=trigger, id='update_request_status')
+
+
+@asynccontextmanager
+async def run_updater():
+    await status_updater()
+    yield
+
+
 @asynccontextmanager
 async def combined_lifespan(app):
-    async with create_permissions_lifespan(), create_role_lifespan(), create_sequence():
+    async with create_permissions_lifespan(), create_role_lifespan(), create_sequence(), run_updater():
         print("Started tasks ...")
         #-----------   BEFORE YIELD WHEN STARTING UP ALL THE FUNCTIONS WORK ---------
         yield

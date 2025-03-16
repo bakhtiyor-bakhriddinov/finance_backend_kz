@@ -9,7 +9,7 @@ from schemas.files import GetFile
 class Invoice(TunedModel):
     id: UUID
     request_id: UUID
-    file: Optional[GetFile]
+    file: Optional[list[GetFile]] = None
     created_at: Optional[datetime]
 
 

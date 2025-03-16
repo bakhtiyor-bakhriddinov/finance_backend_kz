@@ -24,6 +24,7 @@ class Settings(BaseSettings):
     admin_role: str = os.getenv("ADMIN_ROLE")
     admin_password: str = os.getenv("ADMIN_PASSWORD")
     BOT_USER: str = os.getenv("BOT_USER")
+    BOT_TOKEN: str = os.getenv("BOT_TOKEN")
 
     # admin_role:str = os.getenv('ADMIN_ROLE')
     # admin_password:str = os.getenv('ADMIN_PASSWORD')
