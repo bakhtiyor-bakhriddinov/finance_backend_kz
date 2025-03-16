@@ -112,7 +112,7 @@ class BaseDAO:
             return query
 
         except SQLAlchemyError as e:
-            print(e)
+            print("SQLAlchemyError: \n", e)
             return None
 
 
@@ -147,7 +147,7 @@ class BaseDAO:
 
         except SQLAlchemyError as e:
             session.rollback()
-            print(e)
+            print("SQLAlchemyError: \n", e)
             return None
 
 

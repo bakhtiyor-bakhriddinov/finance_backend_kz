@@ -1,11 +1,14 @@
+import asyncio
+import threading
 from contextlib import asynccontextmanager, contextmanager
-from datetime import datetime
+from datetime import datetime, date
 
 import pytz
 from apscheduler.schedulers.background import BackgroundScheduler
 from apscheduler.triggers.cron import CronTrigger
 from apscheduler.triggers.interval import IntervalTrigger
 from fastapi import Depends
+from sqlalchemy import text, and_, func, select
 from sqlalchemy.orm import Session
 
 from core.config import settings
@@ -17,6 +20,9 @@ from utils.utils import Hasher
 
 timezonetash = pytz.timezone('Asia/Tashkent')
 
+# ✅ Get the main event loop at startup
+main_loop = asyncio.new_event_loop()
+asyncio.set_event_loop(main_loop)
 
 
 scheduler = BackgroundScheduler()
@@ -113,15 +119,40 @@ async def create_role_lifespan():
 
 
 
-async def request_status_update(db: Session = Depends(get_db)):
-    today = datetime.now(tz=timezonetash).date()
-    query = await RequestDAO.get_all(session=db, filters={"status": 1, "payment_time": today})
-    requests = db.execute(query).scalars().all()
-    for request in requests:
-        # time.sleep(1)
-        await RequestDAO.update(session=db, data={"id": request.id, "status": 2})
+async def request_status_update():
+    @contextmanager
+    def get_session():
+        with session_maker() as session:
+            yield session  # Ensure session is properly yielded
+            session.close()
+
+    with get_session() as session:
+        print("\n--------- Started job working every minute ------------\n")
+        today = date.today()
+        today_query = await RequestDAO.get_all(session=session, filters={"status": [1], "payment_time": today})
+        today_requests = session.execute(today_query).scalars().all()
+        for request in today_requests:
+            # time.sleep(1)
+            await RequestDAO.update(session=session, data={"id": request.id, "status": 2})
+
+        expired_requests = session.query(RequestDAO.model).filter(
+            and_(
+                RequestDAO.model.status == 1,
+                func.date(RequestDAO.model.payment_time) > today
+            )
+        ).all()
+        for request in expired_requests:
+            # time.sleep(1)
+            await RequestDAO.update(session=session, data={"id": request.id, "status": 3})
+
+        session.commit()
 
 
+
+# ✅ Use `run_coroutine_threadsafe` to run async function from a thread
+def run_async_job():
+    future = asyncio.run_coroutine_threadsafe(request_status_update(), main_loop)
+    future.result()  # Ensures exceptions are properly raised
 
 
 async def status_updater():
@@ -129,8 +160,20 @@ async def status_updater():
     # trigger = CronTrigger(
     #     hour=11, minute=30, second=00, timezone=timezonetash
     # )
-    trigger = IntervalTrigger(minutes=10)
-    job_scheduler.add_job(request_status_update, trigger=trigger, id='update_request_status')
+    trigger = IntervalTrigger(minutes=1)
+    job_scheduler.add_job(run_async_job, trigger=trigger, id='update_request_status')
+
+
+
+# ✅ Start the asyncio event loop in a separate thread
+def start_event_loop():
+    asyncio.set_event_loop(main_loop)
+    main_loop.run_forever()
+
+
+event_loop_thread = threading.Thread(target=start_event_loop, daemon=True)
+event_loop_thread.start()
+
 
 
 @asynccontextmanager

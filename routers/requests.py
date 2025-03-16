@@ -167,7 +167,7 @@ async def update_request(
         inline_keyboard = None
         status = updated_request.status
         number = updated_request.number
-        if status == 0: # Новый
+        if status == 1: # Новый
             message_text = (f"Ваша заявка #{number}s принята со стороны  финансового отдела.\n"
                             f"Срок оплаты {updated_request.payment_time.strftime('%d.%m.%Y')}")
         elif status == 4: # Отменен
@@ -189,8 +189,9 @@ async def update_request(
 
         send_telegram_message(chat_id=updated_request.client.tg_id, message_text=message_text, keyboard=inline_keyboard)
 
-    if body.payment_time is not None:
-        message_text = (f"Срок оплаты по вашей заявке изменен с {old_request.payment_time.strftime('%d.%m.%Y')} на "
+    if body.payment_time is not None and old_request.payment_time is not None:
+        message_text = (f"Срок оплаты по вашей заявке {updated_request.number} изменен с "
+                        f"{old_request.payment_time.strftime('%d.%m.%Y')} на "
                         f"{updated_request.payment_time.strftime('%d.%m.%Y')} по причине:\n"
                         f"“{updated_request.comment}”")
         send_telegram_message(chat_id=updated_request.client.tg_id, message_text=message_text)
