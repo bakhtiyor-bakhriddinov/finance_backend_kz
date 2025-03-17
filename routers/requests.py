@@ -154,8 +154,8 @@ async def update_request(
             }
         )
 
-    db.commit()
-    db.refresh(updated_request)
+        db.commit()
+        db.refresh(updated_request)
 
     if body.status is not None:
         # create logs
@@ -167,6 +167,9 @@ async def update_request(
                 "user_id": current_user["id"]
             }
         )
+        db.commit()
+        db.refresh(updated_request)
+
         message_text = ""
         inline_keyboard = None
         status = updated_request.status
