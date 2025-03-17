@@ -138,7 +138,8 @@ async def update_request(
     body_dict = body.model_dump(exclude_unset=True)
     body_dict.pop("file_paths", None)
     body_dict.pop("invoice", None)
-    old_request = await RequestDAO.get_by_attributes(session=db, filters={"id": body.id}, first=True)
+    request = await RequestDAO.get_by_attributes(session=db, filters={"id": body.id}, first=True)
+    request_payment_time = request.payment_time
     updated_request = await RequestDAO.update(session=db, data=body_dict)
 
     db.commit()
@@ -199,9 +200,9 @@ async def update_request(
 
         send_telegram_message(chat_id=updated_request.client.tg_id, message_text=message_text, keyboard=inline_keyboard)
 
-    if body.payment_time is not None and old_request.payment_time is not None:
+    if body.payment_time is not None and request_payment_time is not None:
         message_text = (f"Срок оплаты по вашей заявке {updated_request.number} изменен с "
-                        f"{old_request.payment_time.strftime('%d.%m.%Y')} на "
+                        f"{request_payment_time.strftime('%d.%m.%Y')} на "
                         f"{updated_request.payment_time.strftime('%d.%m.%Y')} по причине:\n"
                         f"“{updated_request.comment}”")
         send_telegram_message(chat_id=updated_request.client.tg_id, message_text=message_text)
