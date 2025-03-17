@@ -141,6 +141,9 @@ async def update_request(
     old_request = await RequestDAO.get_by_attributes(session=db, filters={"id": body.id}, first=True)
     updated_request = await RequestDAO.update(session=db, data=body_dict)
 
+    db.commit()
+    db.refresh(updated_request)
+
     if body.file_paths is not None and body.invoice is not None:
         invoice = None
         if body.invoice is not None:
