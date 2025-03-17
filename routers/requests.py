@@ -197,8 +197,10 @@ async def update_request(
                     ] for file in updated_request.invoice.file
                 ]
             }
-
-        send_telegram_message(chat_id=updated_request.client.tg_id, message_text=message_text, keyboard=inline_keyboard)
+        try:
+            send_telegram_message(chat_id=updated_request.client.tg_id, message_text=message_text, keyboard=inline_keyboard)
+        except Exception as e:
+            print("Sending Error: ", e)
 
     if body.payment_time is not None and request_payment_time is not None:
         message_text = (f"Срок оплаты по вашей заявке {updated_request.number} изменен с "
