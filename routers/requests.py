@@ -191,10 +191,10 @@ async def update_request(
                 "inline_keyboard": [
                     [
                         {
-                            "text": "Посмотреть фото",
+                            "text": f"Посмотреть фото №{i}",
                             "url": f"{settings.BASE_URL}{file.file_paths if updated_request.invoice else ''}"
                         }
-                    ] for file in updated_request.invoice.file
+                    ] for i, file in enumerate(updated_request.invoice.file)
                 ]
             }
         try:

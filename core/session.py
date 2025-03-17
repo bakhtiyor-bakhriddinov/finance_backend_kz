@@ -17,7 +17,7 @@ if settings.DB_URL is None:
 
 # engine = create_async_engine(settings.DB_URL, future=True, echo=True)
 # async_session_maker = async_sessionmaker(engine, expire_on_commit=False, class_=AsyncSession)
-engine = create_engine(settings.DB_URL, future=True, echo=True)
+engine = create_engine(settings.DB_URL, future=True, echo=False)
 session_maker = sessionmaker(engine, expire_on_commit=False, autocommit=False, autoflush=False)
 # loop = asyncio.get_event_loop_policy().get_event_loop()
 
