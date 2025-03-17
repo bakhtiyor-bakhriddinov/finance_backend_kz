@@ -192,9 +192,9 @@ async def update_request(
                     [
                         {
                             "text": f"Посмотреть фото №{i}",
-                            "url": f"{settings.BASE_URL}/{file_url if updated_request.invoice else ''}"
-                        }
-                    ] for i, file_url in enumerate(updated_request.invoice.file.file_paths)
+                            "url": f"{settings.BASE_URL}/{file_path if updated_request.invoice else ''}"
+                        } for i, file_path in enumerate(file)
+                    ] for file in updated_request.invoice.file
                 ]
             }
         try:
