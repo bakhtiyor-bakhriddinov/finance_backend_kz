@@ -193,7 +193,7 @@ async def update_request(
                         {
                             "text": f"Посмотреть фото №{i}",
                             "url": f"{settings.BASE_URL}/{file_path if updated_request.invoice else ''}"
-                        } for i, file_path in enumerate(file)
+                        } for i, file_path in enumerate(file.file_paths)
                     ] for file in updated_request.invoice.file
                 ]
             }
