@@ -61,29 +61,33 @@ def create_access_token(data: dict):
 
 
 async def get_current_user(token: str = Depends(reuseable_oauth), session: AsyncSession = Depends(get_db)):
-    print('current tokent',token)
+    # print('current tokent',token)
     try:
-        print('before payload')
+        # print('before payload')
         payload = jwt.decode(token, settings.SECRET_KEY, algorithms=[settings.ALGORITHM])
-        print('after payload')
+        # print('after payload')
         username = payload.get('sub')
-        print('after username')
-        expire_datetime = payload.get('exp')
-        print('expire datetime')
+        # print('after username')
+        expire_datetime = payload.get('exp', None)
+        # print('expire datetime')
         user = payload.get('user')
-        print("username: ", username)
-        if username == settings.BOT_USER:
-            print("user is entering",settings.BOT_USER)
+        # print("username: ", username)
+        # if username == settings.BOT_USER:
+        #     # print("user is entering",settings.BOT_USER)
+        #     return user
+        if expire_datetime is None:
             return user
-        if datetime.fromtimestamp(expire_datetime) < datetime.now():
-            raise HTTPException(
-                status_code=status.HTTP_401_UNAUTHORIZED,
-                detail='Token is expired',
-                headers={'WWW-Authenticate': 'Bearer'},
-            )
+        else:
+            if datetime.fromtimestamp(expire_datetime) < datetime.now():
+                raise HTTPException(
+                    status_code=status.HTTP_401_UNAUTHORIZED,
+                    detail='Token is expired',
+                    headers={'WWW-Authenticate': 'Bearer'},
+                )
 
-    except Exception as e:
-        print("this is the error",e)
+    # except Exception as e:
+    except (JWTError, ValidationError) as e:
+        print("JWT ERROR: ", e)
         raise CREDENTIALS_EXCEPTION
 
     # user = await _get_user_by_username(session=session, username=username)

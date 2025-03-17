@@ -55,16 +55,16 @@ async def create_permissions_lifespan():
     with get_session() as session:
         for key, value in permission_groups.items():
             permission_group = await PermissionGroupDAO.add(session=session, **{"name": key})
-            print("created permission_group: ", permission_group)
+            # print("created permission_group: ", permission_group)
             if permission_group is not None:
                 permission_group_id = permission_group.id
 
                 for name, action in value.items():
                     permission = await PermissionDAO.get_by_attributes(session=session, filters={"group_id": permission_group_id, "name": name}, first=True)
-                    print("permission: ", permission)
+                    # print("permission: ", permission)
                     if permission is None:
                         created_permission = await PermissionDAO.add(session=session, **{"name": name, "action": action, "group_id": permission_group_id})
-                        print("created permission: ", created_permission)
+                        # print("created permission: ", created_permission)
 
                 session.commit()
 
@@ -83,7 +83,7 @@ async def create_role_lifespan():
 
     with get_session() as session:
         role = await RoleDAO.get_by_attributes(session=session, filters={"name": settings.admin_role, "description": 'Superuser'}, first=True)
-        print("ROLE: ", role)
+        # print("ROLE: ", role)
         if not role:
             role = await RoleDAO.add(session=session, **{"name": settings.admin_role, "description": 'Superuser'})
 
@@ -98,13 +98,13 @@ async def create_role_lifespan():
                 for name, action in value.items():
                     if action not in role_permissions:
                         permission = await PermissionDAO.get_by_attributes(session=session, filters={"action": action}, first=True)
-                        print("Permission: ", permission.action)
+                        # print("Permission: ", permission.action)
                         if permission is not None:
                             await AccessDAO.add(session=session, **{"permission_id": permission.id, "role_id": role_id})
                             session.commit()
 
 
-            user = UserDAO.add(
+            user = await UserDAO.add(
                 session=session,
                 **{
                     "username": settings.admin_role,
@@ -113,7 +113,7 @@ async def create_role_lifespan():
                 }
             )
             session.commit()
-            print("Created Admin user: ", user)
+            # print("Created Admin user: ", user)
 
     yield  #--------------  HERE YOU CAN WRITE LOG ON CLOSING AFTER YIELD ------------
 
@@ -127,7 +127,7 @@ async def request_status_update():
             session.close()
 
     with get_session() as session:
-        print("\n--------- Started job working every minute ------------\n")
+        print("\n--------- Started job working every time period ------------\n")
         today = date.today()
         today_query = await RequestDAO.get_all(session=session, filters={"status": [1], "payment_time": today})
         today_requests = session.execute(today_query).scalars().all()

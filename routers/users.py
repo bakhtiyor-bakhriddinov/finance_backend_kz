@@ -44,11 +44,17 @@ async def login(
         "permissions": permissions
     }
     expire = datetime.now() + timedelta(minutes=settings.ACCESS_TOKEN_EXPIRE_MINUTES)
-    data = {
-        "sub": user.username,
-        "exp": expire,
-        "user": user_info
-    }
+    if user.username == settings.BOT_USER:
+        data = {
+            "sub": user.username,
+            "user": user_info
+        }
+    else:
+        data = {
+            "sub": user.username,
+            "exp": expire,
+            "user": user_info
+        }
 
     return {
         "access_token": create_access_token(data=data),
