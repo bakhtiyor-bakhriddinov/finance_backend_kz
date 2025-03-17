@@ -61,7 +61,7 @@ def create_access_token(data: dict):
 
 
 async def get_current_user(token: str = Depends(reuseable_oauth), session: AsyncSession = Depends(get_db)):
-    print('current tokent')
+    print('current tokent',token)
     try:
         payload = jwt.decode(token, settings.SECRET_KEY, algorithms=[settings.ALGORITHM])
         username = payload.get('sub')
