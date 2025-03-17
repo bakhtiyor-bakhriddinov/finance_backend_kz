@@ -67,6 +67,7 @@ async def get_current_user(token: str = Depends(reuseable_oauth), session: Async
         expire_datetime = payload.get('exp')
         user = payload.get('user')
         print("username: ", username)
+        print('last ',token)
         if username == settings.BOT_USER:
             print("user is entering",settings.BOT_USER)
             return user
