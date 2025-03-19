@@ -47,8 +47,9 @@ async def get_client_list(
     if is_active is not None:
         filters["is_active"] = is_active
 
-    objs = await ClientDAO.get_all(session=db, filters=filters if filters else None)
-    return paginate(objs)
+    query = await ClientDAO.get_all(session=db, filters=filters if filters else None)
+    result = db.execute(query).scalars().all()
+    return paginate(result)
 
 
 
