@@ -37,6 +37,7 @@ class Requests(TunedModel):
 
 class Request(Requests):
     comment: Optional[str] = None
+    approve_comment: Optional[str] = None
     payer_company: Optional[str] = None
     payment_time: Optional[date] = None
     contract: Optional[Contract] = None

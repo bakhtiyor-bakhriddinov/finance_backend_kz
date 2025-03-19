@@ -96,7 +96,10 @@ class BaseDAO:
                         elif k == "created_at":
                             conditions.append(func.date(column) == v)
                         else:
-                            conditions.append(column == v)
+                            if isinstance(v, str):
+                                conditions.append(column.ilike(f"%{v}%"))
+                            else:
+                                conditions.append(column == v)
 
                         # elif k == "created_at_start" or k == "created_at_finish":
                         #     if k == "created_at_start":

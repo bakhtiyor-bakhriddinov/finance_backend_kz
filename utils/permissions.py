@@ -88,4 +88,7 @@ permission_groups = {
         "create": "create_log",
         "read": "read_log"
     },
+    "Settings": {
+        "restart": "restart_bot"
+    }
 }
