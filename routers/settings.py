@@ -10,7 +10,7 @@ settings_router = APIRouter()
 async def restart_bot():
     try:
         completed_process = subprocess.run(
-            ["sudo", "systemctl", "restart", "finance_bot.service"],
+            ["sudo", "/bin/systemctl", "restart", "finance_bot.service"],
             check=True,
             text=True,
             capture_output=True
