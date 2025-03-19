@@ -149,6 +149,7 @@ async def update_request(
     if body.approved is True:
         if "approve" not in current_user["permissions"]["Requests"]:
             body_dict.pop("approved", None)
+            body_dict.pop("approve_comment", None)
             raise HTTPException(status_code=404, detail="У вас нет прав одобрить заявку !")
 
     updated_request = await RequestDAO.update(session=db, data=body_dict)

@@ -68,6 +68,7 @@ class CreateRequest(TunedModel):
 class UpdateRequest(TunedModel):
     id: UUID
     approved: Optional[bool] = None
+    approve_comment: Optional[str] = None
     status: Optional[int] = None
     payment_time: Optional[date] = None
     comment: Optional[str] = None

@@ -19,6 +19,7 @@ class Requests(Base):
     cash = Column(DECIMAL)
     description = Column(Text)
     comment = Column(Text)
+    approve_comment = Column(Text)
     payer_company = Column(String)
     status = Column(Integer)
     contract = relationship('Contracts', back_populates='request', uselist=False, passive_deletes=True) # lazy='selectin'
