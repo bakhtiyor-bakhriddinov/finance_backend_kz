@@ -243,10 +243,12 @@ async def update_request(
             # }
             try:
                 send_telegram_message(chat_id=chat_id, message_text=request_text, keyboard=inline_keyboard)
-                file_paths = updated_request.invoice.file.file_paths if updated_request.invoice else None
-                if file_paths is not None:
-                    for file_path in file_paths:
-                        send_telegram_document(chat_id=updated_request.client.tg_id, file_path=file_path)
+                if updated_request.invoice is not None:
+                    files = updated_request.invoice.file
+                    for file in files:
+                        file_paths = file.file_paths
+                        for file_path in file_paths:
+                            send_telegram_document(chat_id=updated_request.client.tg_id, file_path=file_path)
             except Exception as e:
                 print("Sending Error: ", e)
 
