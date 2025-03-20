@@ -196,7 +196,7 @@ async def update_request(
         inline_keyboard = None
         request_text = (
             f"📌 Заявка #{request.number}s\n\n"
-            f"📅 Дата заявки: {datetime.strptime(request.created_at, '%Y-%m-%dT%H:%M:%S.%fZ').strftime('%d.%m.%Y')}\n"
+            f"📅 Дата заявки: {request.created_at.strftime('%d.%m.%Y')}\n"
             f"📍 Отдел: {request.department.name}\n"
             f"👤 Заказчик: {request.client.fullname}\n"
             f"📞 Номер заказчика: {request.client.phone}\n"
