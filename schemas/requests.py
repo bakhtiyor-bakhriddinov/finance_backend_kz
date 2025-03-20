@@ -60,7 +60,7 @@ class CreateRequest(TunedModel):
     status: Optional[int] = 0
     sum: float
     currency: Optional[str] = None
-    to_accounting: Optional[bool] = True
+    to_accounting: Optional[bool] = False
     payment_type_id: UUID
     cash: Optional[float] = None
     payment_card: Optional[str] = None

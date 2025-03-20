@@ -153,7 +153,7 @@ async def update_request(
             raise HTTPException(status_code=404, detail="У вас нет прав одобрить заявку !")
 
     if body.to_accounting is True:
-        if request.payment_type_id != "88a747c1-5616-437c-ac71-a02b30287ee8":
+        if request.payment_type_id != UUID("88a747c1-5616-437c-ac71-a02b30287ee8"):
             body_dict.pop("to_accounting", None)
             raise HTTPException(status_code=404, detail="Тип оплаты не является перечислением !")
 
