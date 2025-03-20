@@ -37,6 +37,8 @@ class Requests(TunedModel):
 
 class Request(Requests):
     comment: Optional[str] = None
+    currency: Optional[str] = None
+    to_accounting: Optional[bool] = None
     approve_comment: Optional[str] = None
     payer_company: Optional[str] = None
     payment_time: Optional[date] = None
@@ -69,6 +71,7 @@ class CreateRequest(TunedModel):
 class UpdateRequest(TunedModel):
     id: UUID
     approved: Optional[bool] = None
+    to_accounting: Optional[bool] = None
     approve_comment: Optional[str] = None
     status: Optional[int] = None
     payment_time: Optional[date] = None

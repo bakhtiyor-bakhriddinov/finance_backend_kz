@@ -11,7 +11,7 @@ from core.config import settings
 from core.session import get_db
 from dal.dao import RequestDAO, InvoiceDAO, ContractDAO, FileDAO, LogDAO
 from schemas.requests import Requests, Request, UpdateRequest, CreateRequest
-from utils.utils import PermissionChecker, send_telegram_message
+from utils.utils import PermissionChecker, send_telegram_message, send_telegram_document
 
 requests_router = APIRouter()
 
@@ -152,6 +152,11 @@ async def update_request(
             body_dict.pop("approve_comment", None)
             raise HTTPException(status_code=404, detail="У вас нет прав одобрить заявку !")
 
+    if body.to_accounting is True:
+        if request.payment_type_id != "88a747c1-5616-437c-ac71-a02b30287ee8":
+            body_dict.pop("to_accounting", None)
+            raise HTTPException(status_code=404, detail="Тип оплаты не является перечислением !")
+
     updated_request = await RequestDAO.update(session=db, data=body_dict)
 
     db.commit()
@@ -187,38 +192,72 @@ async def update_request(
         db.refresh(updated_request)
 
         message_text = ""
+        chat_id = updated_request.client.tg_id
         inline_keyboard = None
+        request_text = (
+            f"📌 Заявка #{request['number']}s\n\n"
+            f"📅 Дата заявки: {datetime.strptime(request['created_at'], '%Y-%m-%dT%H:%M:%S.%fZ').strftime('%d.%m.%Y')}\n"
+            f"📍 Отдел: {request['department']['name']}\n"
+            f"👤 Заказчик: {request['client']['fullname']}\n"
+            f"📞 Номер заказчика: {request['client']['phone']}\n"
+            f"🛒 Закупщик: {request['buyer']}\n"
+            f"💰 Тип затраты: {request['expense_type']['name']}\n"
+            f"🏢 Поставщик: {request['supplier']}\n\n"
+            f"💲 Стоимость: {int(request['sum'])} сум\n"
+            f"💵 Валюта: {request['currency']}\n"
+            f"💳 Тип оплаты: {request['payment_type']['name']}\n"
+            f"💳 Карта перевода: {request['payment_card'] if request['payment_card'] is not None else ''}\n"
+            f"📜 № Заявки в SAP: {request['sap_code']}\n\n"
+            f"📝 Комментарии: {request['description']}\n\n"
+            f"📃 Документ оплаты 👇"
+        )
         status = updated_request.status
         number = updated_request.number
-        if status == 1: # Новый
+        if status == 1: # Принят
+            if request.payment_type_id == "822e49f7-f54e-481e-997d-e4cb81b061e1":
+                chat_id = None  # chat id of group
+                try:
+                    send_telegram_message(chat_id=chat_id, message_text=request_text, keyboard=inline_keyboard)
+                except Exception as e:
+                    print("Sending Error: ", e)
+
             message_text = (f"Ваша заявка #{number}s принята со стороны  финансового отдела.\n"
                             f"Срок оплаты {updated_request.payment_time.strftime('%d.%m.%Y')}")
+            send_telegram_message(chat_id=chat_id, message_text=message_text, keyboard=inline_keyboard)
+
         elif status == 4: # Отменен
             message_text = (f"Ваша заявка #{number}s отменена по причине:\n"
                             f"{updated_request.comment}")
+            send_telegram_message(chat_id=chat_id, message_text=message_text, keyboard=inline_keyboard)
+
         elif status == 5: # Обработан
-            message_text = (f"Оплата по вашей заявке #{number}s проведена.\n"
-                            f"Документ оплаты: “квиток фото”")
-            inline_keyboard = {
-                "inline_keyboard": [
-                    [
-                        {
-                            "text": f"Посмотреть фото №{i+1}",
-                            "url": f"{settings.BASE_URL}/{file_path if updated_request.invoice else ''}"
-                        } for i, file_path in enumerate(file.file_paths)
-                    ] for file in updated_request.invoice.file
-                ]
-            }
-        try:
-            send_telegram_message(chat_id=updated_request.client.tg_id, message_text=message_text, keyboard=inline_keyboard)
-        except Exception as e:
-            print("Sending Error: ", e)
+            # inline_keyboard = {
+            #     "inline_keyboard": [
+            #         [
+            #             {
+            #                 "text": f"Посмотреть фото №{i+1}",
+            #                 "url": f"{settings.BASE_URL}/{file_path if updated_request.invoice else ''}"
+            #             } for i, file_path in enumerate(file.file_paths)
+            #         ] for file in updated_request.invoice.file
+            #     ]
+            # }
+            try:
+                send_telegram_message(chat_id=chat_id, message_text=request_text, keyboard=inline_keyboard)
+                file_paths = updated_request.invoice.file.file_paths if updated_request.invoice else None
+                if file_paths is not None:
+                    for file_path in file_paths:
+                        send_telegram_document(chat_id=updated_request.client.tg_id, file_path=file_path)
+            except Exception as e:
+                print("Sending Error: ", e)
 
     if body.payment_time is not None and request_payment_time is not None:
         message_text = (f"Срок оплаты по вашей заявке {updated_request.number} изменен с "
                         f"{request_payment_time.strftime('%d.%m.%Y')} на "
                         f"{updated_request.payment_time.strftime('%d.%m.%Y')} по причине:\n"
                         f"“{updated_request.comment}”")
-        send_telegram_message(chat_id=updated_request.client.tg_id, message_text=message_text)
+        try:
+            send_telegram_message(chat_id=updated_request.client.tg_id, message_text=message_text)
+        except Exception as e:
+            print("Sending Error: ", e)
 
     return updated_request

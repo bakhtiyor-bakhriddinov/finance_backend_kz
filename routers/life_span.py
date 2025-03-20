@@ -15,8 +15,7 @@ from core.config import settings
 from core.session import session_maker, create_sequence, get_db
 from dal.dao import PermissionGroupDAO, PermissionDAO, RoleDAO, AccessDAO, UserDAO, RequestDAO
 from utils.permissions import permission_groups
-from utils.utils import Hasher
-
+from utils.utils import Hasher, send_telegram_message
 
 timezonetash = pytz.timezone('Asia/Tashkent')
 
@@ -140,6 +139,13 @@ async def request_status_update():
         for request in today_requests:
             # time.sleep(1)
             await RequestDAO.update(session=session, data={"id": request.id, "status": 2})
+            try:
+                send_telegram_message(
+                    chat_id=request.client.tg_id,
+                    message_text=f"Сегодня срок оплаты вашей заявки #{request.number}s"
+                )
+            except Exception as e:
+                print("Sending Error: ", e)
 
         expired_requests = session.query(RequestDAO.model).filter(
             and_(
