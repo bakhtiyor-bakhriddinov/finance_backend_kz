@@ -125,7 +125,8 @@ async def upload(request: Request):
     except streaming_form_data.validators.ValidationError:
         raise HTTPException(status_code=status.HTTP_413_REQUEST_ENTITY_TOO_LARGE,
                             detail=f'Maximum file size limit ({MAX_FILE_SIZE} bytes) exceeded')
-    except Exception:
+    except Exception as e:
+        print("exception uploading file: ", e)
         raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
                             detail='There was an error uploading the file')
 

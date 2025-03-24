@@ -168,6 +168,7 @@ async def update_request(
                 raise HTTPException(status_code=404, detail="Сначала загрузите квитанцию оплаты !")
 
 
+
     updated_request = await RequestDAO.update(session=db, data=body_dict)
 
     db.commit()
@@ -188,6 +189,16 @@ async def update_request(
 
         db.commit()
         db.refresh(updated_request)
+
+    if body.approved is True:
+        chat_id = updated_request.client.tg_id
+        number = updated_request.number
+        message_text = (f"Ваша заявка #{number}s одобрена"
+                        f"{updated_request.comment}")
+        try:
+            send_telegram_message(chat_id=chat_id, message_text=message_text)
+        except Exception as e:
+            print("Sending Error: ", e)
 
     if body.status is not None:
         # create logs
