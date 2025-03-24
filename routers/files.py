@@ -103,6 +103,7 @@ async def upload(request: Request):
                             detail='Filename header is missing')
     try:
         filename = unquote(filename)
+        filename = filename.replace(' ', '')
         filepath = os.path.join(save_dir, os.path.basename(filename))
         file_ = FileTarget(filepath, validator=MaxSizeValidator(MAX_FILE_SIZE))
         data = ValueTarget()
