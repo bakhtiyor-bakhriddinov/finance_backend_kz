@@ -230,7 +230,7 @@ async def update_request(
             f"💳 Карта перевода: {request.payment_card if request.payment_card is not None else ''}\n"
             f"📜 № Заявки в SAP: {request.sap_code}\n\n"
             f"📝 Комментарии: {request.description}\n\n"
-            + (f"📃 Документ оплаты 👇\n" if request.invoice else "")
+            + (f"📃 Документы оплаты 👇\n" if request.invoice else "")
         )
         status = updated_request.status
         number = updated_request.number
@@ -253,7 +253,7 @@ async def update_request(
 
         elif status == 5: # Обработан
             try:
-                send_telegram_message(chat_id=chat_id, message_text=request_text, keyboard=inline_keyboard)
+                send_telegram_message(chat_id=chat_id, message_text=f"Оплачено✅\n\n{request_text}", keyboard=inline_keyboard)
                 if updated_request.invoice is not None:
                     files = updated_request.invoice.file
                     for file in files:
