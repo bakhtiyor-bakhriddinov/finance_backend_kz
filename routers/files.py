@@ -1,7 +1,7 @@
 import os
 from datetime import datetime
 from typing import List, Union
-from utils.utils import generate_random_string
+from utils.utils import generate_random_string, error_sender
 
 from fastapi import APIRouter, UploadFile
 from fastapi import Depends, File
@@ -120,13 +120,16 @@ async def upload(request: Request):
     except ClientDisconnect:
         print("Client Disconnected")
     except MaxBodySizeException as e:
+        error_sender(error_message=f"FINANCE BACKEND: \n{e}")
         raise HTTPException(status_code=status.HTTP_413_REQUEST_ENTITY_TOO_LARGE,
                             detail=f'Maximum request body size limit ({MAX_REQUEST_BODY_SIZE} bytes) exceeded ({e.body_len} bytes read)')
     except streaming_form_data.validators.ValidationError:
+        error_sender(error_message=f"FINANCE BACKEND: \n{e}")
         raise HTTPException(status_code=status.HTTP_413_REQUEST_ENTITY_TOO_LARGE,
                             detail=f'Maximum file size limit ({MAX_FILE_SIZE} bytes) exceeded')
     except Exception as e:
         print("exception uploading file: ", e)
+        error_sender(error_message=f"FINANCE BACKEND: \n{e}")
         raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
                             detail='There was an error uploading the file')
 

@@ -200,3 +200,24 @@ def send_telegram_document(chat_id, file_path):
 def generate_random_string(length=10):
     characters = string.ascii_letters + string.digits  # A-Z, a-z, 0-9
     return ''.join(random.choices(characters, k=length))
+
+
+
+def error_sender(error_message):
+    payload = {
+        "chat_id": settings.ERROR_GROUP,
+        "text": error_message,
+        "parse_mode": "HTML"
+    }
+
+    # Send the request to send the inline keyboard message
+    response = requests.post(
+        url=f"https://api.telegram.org/bot{settings.ERROR_BOT}/sendMessage",
+        json=payload
+    )
+    # Check the response status
+    if response.status_code == 200:
+        return response
+    else:
+        print("Response text: ", response.text)
+        return None

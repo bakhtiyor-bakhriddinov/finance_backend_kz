@@ -26,6 +26,8 @@ class Settings(BaseSettings):
     BOT_USER: str = os.getenv("BOT_USER")
     BOT_TOKEN: str = os.getenv("BOT_TOKEN")
     CHAT_GROUP: str = os.getenv("CHAT_GROUP")
+    ERROR_GROUP: str = os.getenv("ERROR_GROUP")
+    ERROR_BOT: str = os.getenv("ERROR_BOT")
 
     # admin_role:str = os.getenv('ADMIN_ROLE')
     # admin_password:str = os.getenv('ADMIN_PASSWORD')
