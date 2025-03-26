@@ -20,8 +20,7 @@ async def get_statistics(
         start_date: date,
         finish_date: date,
         db: Session = Depends(get_db),
-        # current_user: dict = Depends(PermissionChecker(required_permissions={"Requests": ["statistics"]}))
-        current_user: dict = Depends(PermissionChecker(required_permissions={}))
+        current_user: dict = Depends(PermissionChecker(required_permissions={"Requests": ["statistics"]}))
 ):
     requests_statuses = db.query(
         RequestDAO.model.status, func.count(RequestDAO.model.id)
