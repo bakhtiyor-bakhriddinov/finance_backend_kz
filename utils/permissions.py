@@ -64,7 +64,8 @@ permission_groups = {
         "update": "update_request",
         "delete": "delete_request",
         "reject": "reject_request",
-        "approve": "approve_request"
+        "approve": "approve_request",
+        "accounting": "показать заявки бухгалтерии"
     },
     "Contracts": {
         "create": "create_contract",
