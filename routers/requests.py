@@ -122,7 +122,7 @@ async def get_request_list(
 async def get_request(
         id: UUID,
         db: Session = Depends(get_db),
-        current_user: dict = Depends(PermissionChecker(required_permissions={"Requests": ["read"]}))
+        current_user: dict = Depends(PermissionChecker(required_permissions={"Requests": ["read", "accounting"]}))
 ):
     obj = await RequestDAO.get_by_attributes(session=db, filters={"id": id}, first=True)
     return obj
@@ -133,7 +133,7 @@ async def get_request(
 async def update_request(
         body: UpdateRequest,
         db: Session = Depends(get_db),
-        current_user: dict = Depends(PermissionChecker(required_permissions={"Requests": ["update"]}))
+        current_user: dict = Depends(PermissionChecker(required_permissions={"Requests": ["update", "accounting 2"]}))
 ):
     body_dict = body.model_dump(exclude_unset=True)
     body_dict.pop("file_paths", None)

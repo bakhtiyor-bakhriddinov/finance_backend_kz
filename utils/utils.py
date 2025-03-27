@@ -115,7 +115,8 @@ class PermissionChecker:
         user_permissions = user['permissions']
         permission_group, required_permissions = next(iter(self.required_permissions.items()))
         user_permissions = user_permissions.get(permission_group, None)
-        need_permissions = set(required_permissions).issubset(user_permissions) if user_permissions else None
+        # need_permissions = set(required_permissions).issubset(user_permissions) if user_permissions else None
+        need_permissions = set(required_permissions).intersection(user_permissions) if user_permissions else None
 
         if not need_permissions:
             raise HTTPException(
