@@ -66,6 +66,7 @@ permission_groups = {
         "reject": "reject_request",
         "approve": "approve_request",
         "accounting": "показать заявки бухгалтерии",
+        "accounting 2": "изменить заявки бухгалтерии",
         "statistics": "показать статистику"
     },
     "Contracts": {
@@ -96,5 +97,9 @@ permission_groups = {
     "Budgets": {
         "create": "создать бюджет",
         "read": "показать бюджет"
+    },
+    "Transactions": {
+        "create": "создать транзакцию",
+        "read": "показать транзакцию"
     }
 }
