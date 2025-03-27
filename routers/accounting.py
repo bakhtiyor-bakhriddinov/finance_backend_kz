@@ -21,7 +21,7 @@ accounting_router = APIRouter()
 @accounting_router.get("/accounting", response_model=Page[Requests])
 async def get_accounting(
         db: Session = Depends(get_db),
-        current_user: dict = Depends(PermissionChecker(required_permissions={"Requests": ["read"]}))
+        current_user: dict = Depends(PermissionChecker(required_permissions={"Requests": ["accounting"]}))
 ):
     filters = {
         "payment_type_id": UUID("88a747c1-5616-437c-ac71-a02b30287ee8"),
