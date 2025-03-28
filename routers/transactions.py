@@ -3,6 +3,7 @@ from typing import List, Optional
 from uuid import UUID
 
 from fastapi import APIRouter, Depends
+from fastapi_pagination import Page, paginate
 from sqlalchemy.orm import Session
 
 from core.session import get_db
@@ -23,12 +24,14 @@ async def create_transaction(
         db: Session = Depends(get_db),
         current_user: dict = Depends(PermissionChecker(required_permissions={"Transactions": ["create"]}))
 ):
-    if body.value > 0:
-        body.is_income = True
-    else:
-        body.is_income = False
+    body_dict = body.model_dump(exclude_none=True)
 
-    created_obj = await TransactionDAO.add(session=db, **body.model_dump())
+    if body.value > 0:
+        body_dict["is_income"] = True
+    else:
+        body_dict["is_income"] = False
+
+    created_obj = await TransactionDAO.add(session=db, **body_dict)
     db.commit()
     db.refresh(created_obj)
     return created_obj
@@ -36,30 +39,13 @@ async def create_transaction(
 
 
 
-# @transactions_router.get("/transactions", response_model=List[Transactions])
-# async def get_transaction_list(
-#         budget_id: Optional[UUID] = None,
-#         request_id: Optional[UUID] = None,
-#         status: Optional[int] = None,
-#         db: Session = Depends(get_db),
-#         current_user: dict = Depends(PermissionChecker(required_permissions={"Transactions": ["read"]}))
-# ):
-#     filters = {}
-#     if budget_id is not None:
-#         filters["budget_id"] = budget_id
-#     if request_id is not None:
-#         filters["request_id"] = request_id
-#     if status is not None:
-#         filters["status"] = status
-#
-#     objs = await TransactionDAO.get_by_attributes(session=db, filters=filters)
-#     for obj in objs:
-#         budget = (await BudgetDAO.get_budget_sum(session=db, budget_id=obj.id))[0]
-#         obj.value = budget
-#
-#     return objs
+@transactions_router.get("/transactions", response_model=Page[Transactions])
+async def get_transaction_list(
+        department_id: Optional[UUID],
+        db: Session = Depends(get_db),
+        current_user: dict = Depends(PermissionChecker(required_permissions={"Transactions": ["read"]}))
+):
 
-
-
-
+    objs = await TransactionDAO.get_department_transactions(session=db, department_id=department_id)
+    return paginate(objs)
 

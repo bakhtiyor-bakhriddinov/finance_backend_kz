@@ -143,3 +143,14 @@ class BudgetDAO(BaseDAO):
 
 class TransactionDAO(BaseDAO):
     model = Transactions
+
+    @classmethod
+    async def get_department_transactions(cls, session: Session, department_id):
+        result = session.query(
+            Transactions
+        ).join(
+            Budgets
+        ).filter(
+            Budgets.department_id == department_id
+        ).all()
+        return result
