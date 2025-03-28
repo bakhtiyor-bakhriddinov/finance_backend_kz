@@ -17,6 +17,7 @@ class Transactions(Base):
     status = Column(Integer)
     value = Column(DECIMAL)
     is_income = Column(Boolean)
+    comment = Column(String)
     created_at = Column(DateTime(timezone=True), default=func.now())
     updated_at = Column(DateTime(timezone=True), onupdate=func.now())
 

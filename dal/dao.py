@@ -140,3 +140,6 @@ class BudgetDAO(BaseDAO):
         ).first()
         return result
 
+
+class TransactionDAO(BaseDAO):
+    model = Transactions

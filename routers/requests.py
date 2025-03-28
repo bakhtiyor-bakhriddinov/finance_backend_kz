@@ -59,6 +59,7 @@ async def get_request_list(
         number: Optional[int] = None,
         client_id: Optional[UUID] = None,
         department_id: Optional[UUID] = None,
+        supplier: Optional[str] = None,
         expense_type_id: Optional[UUID] = None,
         payment_type_id: Optional[UUID] = None,
         payment_sum: Optional[float] = None,
@@ -77,6 +78,8 @@ async def get_request_list(
         filters["client_id"] = client_id
     if department_id is not None:
         filters["department_id"] = department_id
+    if supplier is not None:
+        filters["supplier"] = supplier
     if expense_type_id is not None:
         filters["expense_type_id"] = expense_type_id
     if payment_type_id is not None:
