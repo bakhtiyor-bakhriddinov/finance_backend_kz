@@ -9,9 +9,9 @@ from schemas.clients import Clients
 
 
 class Departments(TunedModel):
-    id: UUID
-    name: str
-    is_active: Optional[bool]
+    id: Optional[UUID] = None
+    name: Optional[str] = None
+    is_active: Optional[bool] = None
     head: Optional[Clients] = None
     total_budget: Optional[float] = None
     created_at: Optional[datetime]

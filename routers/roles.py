@@ -7,7 +7,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import Session
 
 from core.session import get_db
-from dal.dao import RoleDAO, AccessDAO, RoleDepartmentDAO
+from dal.dao import RoleDAO, AccessDAO, RoleDepartmentDAO, DepartmentDAO
 from schemas.roles import GetRole, CreateRole, GetRoles, UpdateRole
 from utils.utils import PermissionChecker
 
@@ -25,6 +25,7 @@ async def create_role(
     departments = body.departments
     body_dict = body.model_dump()
     body_dict.pop("permissions", None)
+    body_dict.pop("departments", None)
     created_role = await RoleDAO.add(session=db, **body_dict)
     if permissions is not None:
         for permission in permissions:
@@ -44,6 +45,10 @@ async def create_role(
         db.commit()
         db.refresh(created_role)
 
+        role_department_relations = await RoleDepartmentDAO.get_by_attributes(session=db,
+                                                                              filters={"role_id": created_role.id})
+        created_role.departments = [relation.department for relation in role_department_relations]
+
     return created_role
 
 
@@ -56,6 +61,18 @@ async def get_role(
 ):
     role = await RoleDAO.get_by_attributes(session=db, filters={"id": id}, first=True)
     role.permissions = [access.permission for access in role.accesses]
+
+    role_department_relations = await RoleDepartmentDAO.get_by_attributes(session=db,
+                                                                          filters={"role_id": role.id})
+    role.departments = [relation.department for relation in role_department_relations]
+    # role_departments = [relation.department_id for relation in role_department_relations]
+
+    # departments = await DepartmentDAO.get_by_attributes(session=db)
+    # departments = [department for department in departments if
+    #                department.id in role_departments] if role_departments else [department for department in
+    #                                                                             departments]
+    # role.departments = departments
+
     return role
 
 
@@ -79,6 +96,7 @@ async def update_role(
     departments = body.departments
     body_dict = body.model_dump(exclude_unset=True)
     body_dict.pop("permissions", None)
+    body_dict.pop("departments", None)
     updated_role = await RoleDAO.update(session=db, data=body_dict)
     if permissions is not None:
         role_accesses = updated_role.accesses
@@ -99,7 +117,7 @@ async def update_role(
         updated_role.permissions = [access.permission for access in role_accesses]
 
     if departments is not None:
-        role_department_relations = updated_role.departments
+        role_department_relations = updated_role.roles_departments
         role_departments = [relation.department_id for relation in role_department_relations]
 
         for department in role_departments:
@@ -113,6 +131,10 @@ async def update_role(
 
         db.commit()
         db.refresh(updated_role)
+
+    role_department_relations = await RoleDepartmentDAO.get_by_attributes(session=db,
+                                                                          filters={"role_id": updated_role.id})
+    updated_role.departments = [relation.department for relation in role_department_relations]
 
     return updated_role
 

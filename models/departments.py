@@ -17,7 +17,7 @@ class Departments(Base):
     head = relationship('Clients', back_populates='department') # lazy="selectin"
     requests = relationship('Requests', back_populates='department', passive_deletes=True) # lazy='select'
     budgets = relationship('Budgets', back_populates='department')
-    roles = relationship('RoleDepartments', back_populates='department')
+    roles_departments = relationship('RoleDepartments', back_populates='department')
     created_at = Column(DateTime(timezone=True), default=func.now())
     updated_at = Column(DateTime(timezone=True), onupdate=func.now())
 
