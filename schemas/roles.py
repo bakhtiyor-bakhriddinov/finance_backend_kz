@@ -3,7 +3,7 @@ from typing import List, Optional
 from uuid import UUID
 
 from .base_model import TunedModel
-# from .departments import Departments
+from .departments import Departments
 from .permissions import GetPermission
 
 
@@ -17,7 +17,7 @@ class GetRoles(TunedModel):
 class GetRole(GetRoles):
     description: Optional[str] = None
     permissions: Optional[List[GetPermission]] = None
-    # departments: Optional[List[Departments]] = None
+    departments: Optional[List[Departments]] = None
 
 
 class CreateRole(TunedModel):

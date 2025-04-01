@@ -5,14 +5,14 @@ from uuid import UUID
 from pydantic import BaseModel
 
 from schemas.base_model import TunedModel
-from schemas.users import GetUsers
+from schemas.clients import Clients
 
 
 class Departments(TunedModel):
     id: UUID
     name: str
     is_active: Optional[bool]
-    head: Optional[GetUsers] = None
+    head: Optional[Clients] = None
     total_budget: Optional[float] = None
     created_at: Optional[datetime]
 
