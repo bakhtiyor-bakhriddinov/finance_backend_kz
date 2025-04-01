@@ -13,7 +13,7 @@ class Departments(Base):
     id = Column(UUID, primary_key=True, default=uuid.uuid4)
     name = Column(String, nullable=False)
     is_active = Column(Boolean, default=True)
-    client_id = Column(UUID, ForeignKey("clients.id", ondelete="SET NULL"), unique=True, nullable=True)
+    client_id = Column(UUID, ForeignKey("clients.id", ondelete="SET NULL"), nullable=True) # unique=True
     head = relationship('Clients', back_populates='department') # lazy="selectin"
     requests = relationship('Requests', back_populates='department', passive_deletes=True) # lazy='select'
     budgets = relationship('Budgets', back_populates='department')
