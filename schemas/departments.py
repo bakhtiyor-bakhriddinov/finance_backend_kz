@@ -18,7 +18,7 @@ class Departments(TunedModel):
 
 
 class Department(Departments):
-    # monthly_budget: Optional[List[dict]] = None
+    monthly_budget: Optional[List[dict]] = None
     updated_at: Optional[datetime] = None
 
 

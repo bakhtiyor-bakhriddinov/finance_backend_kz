@@ -1,4 +1,5 @@
 from collections import defaultdict
+from datetime import date
 from typing import Optional, List
 from uuid import UUID
 
@@ -7,7 +8,7 @@ from fastapi_pagination import Page, paginate
 from sqlalchemy.orm import Session
 
 from core.session import get_db
-from dal.dao import DepartmentDAO, UserDAO
+from dal.dao import DepartmentDAO, UserDAO, TransactionDAO
 from schemas.departments import Department, CreateDepartment, Departments, UpdateDepartment
 from utils.utils import PermissionChecker
 
@@ -30,6 +31,8 @@ async def create_department(
 @departments_router.get("/departments", response_model=Page[Departments])
 async def get_department_list(
         name: Optional[str] = None,
+        start_date: Optional[date] = None,
+        finish_date: Optional[date] = None,
         db: Session = Depends(get_db),
         current_user: dict = Depends(PermissionChecker(required_permissions={"Departments": ["read", "accounting"]}))
 ):
@@ -43,9 +46,13 @@ async def get_department_list(
     role_departments = [relation.department_id for relation in role_department_relations]
     departments = [department for department in departments if department.id in role_departments] if role_departments else [department for department in departments]
     for department in departments:
-        budget = (await DepartmentDAO.get_department_total_budget(session=db, department_id=department.id))[0]
-        # print(budget)
+        budget = (
+            await DepartmentDAO.get_department_total_budget(
+                session=db, department_id=department.id, start_date=start_date, finish_date=finish_date
+            )
+        )[0]
         department.total_budget = budget
+        print("total_budget: ", budget)
 
     return paginate(departments)
 
@@ -53,25 +60,26 @@ async def get_department_list(
 @departments_router.get("/departments/{id}", response_model=Department)
 async def get_department(
         id: UUID,
+        start_date: Optional[date] = None,
+        finish_date: Optional[date] = None,
         db: Session = Depends(get_db),
         current_user: dict = Depends(PermissionChecker(required_permissions={"Departments": ["read"]}))
 ):
     department = await DepartmentDAO.get_by_attributes(session=db, filters={"id": id}, first=True)
-    # budget = await DepartmentDAO.get_department_monthly_budget(session=db, department_id=id)
-    # print("budget: ", budget)
-    # department.monthly_budget = None
+    budget = await DepartmentDAO.get_department_monthly_budget(session=db, department_id=id, start_date=start_date, finish_date=finish_date)
 
-    # # Group data by year
+    # Group data by year
     # result_dict = defaultdict(dict)
-    #
-    # for year, month, value in department.monthly_budget:
-    #     result_dict[int(year)][int(month)] = float(value)
-    #
-    # # Convert defaultdict to a list of dictionaries
-    # department.monthly_budget = [{year: months} for year, months in result_dict.items()]
+    result_dict = defaultdict(lambda: defaultdict(lambda: {"budget": 0.0, "expense": 0.0, "balance": 0.0}))
+    print("budget: ", budget)
 
-    # Print result
-    # print(department.monthly_budget)
+    for year, month, type, sum in budget:
+        result_dict[int(year)][int(month)][type] = -float(sum) if type == "expense" else float(sum)
+        result_dict[int(year)][int(month)]["balance"] = result_dict[int(year)][int(month)]["budget"] - result_dict[int(year)][int(month)]["expense"]
+
+    # Convert defaultdict to a list of dictionaries
+    department.monthly_budget = [{year: dict(months)} for year, months in result_dict.items()]
+    print(department.monthly_budget)
 
     return department
 

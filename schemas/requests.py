@@ -88,6 +88,7 @@ class UpdateRequest(TunedModel):
 
 
 class RequestTransactions(TunedModel):
+    id: UUID
     number: int
     expense_type: Optional[ExpenseTypes] = None
     sum: float = None
