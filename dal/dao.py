@@ -322,17 +322,18 @@ class TransactionDAO(BaseDAO):
             # func.sum(-Transactions.value)
             func.sum(Requests.sum)
         ).join(
-            # Requests, Transactions.request_id == Requests.id
-            Transactions, Transactions.request_id == Requests.id
-        ).join(
             PaymentTypes, Requests.payment_type_id == PaymentTypes.id
         ).filter(
             and_(
                 func.date(Requests.payment_time).between(start_date, finish_date),
-                Transactions.status == 1
+                Requests.status.in_([1, 2, 3])
             )
         ).group_by(
             func.date(Requests.payment_time),
             PaymentTypes.name
         ).all()
+        # .join(
+        #             # Requests, Transactions.request_id == Requests.id
+        #             Transactions, Transactions.request_id == Requests.id
+        #         )
         return result
