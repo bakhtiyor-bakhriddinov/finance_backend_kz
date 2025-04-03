@@ -117,14 +117,24 @@ async def get_calendar_transaction_list(
     # print(result)
 
     # Process results into the required structure
-    grouped_data = defaultdict(lambda: {"transactions": {}, "total": 0})
+    # grouped_data = defaultdict(lambda: {"transactions": {}, "total": 0})
+    #
+    # for date, payment_type, total_value in result:
+    #     date_str = str(date)  # Convert date to string
+    #     grouped_data[date_str]["transactions"][payment_type] = float(total_value)  # Convert Decimal to int
+    #     grouped_data[date_str]["total"] += float(total_value)  # Update total sum
+    #
+    # # Convert to the expected list format
+    # return [{date: data["transactions"], "total": data["total"]} for date, data in grouped_data.items()]
+
+    grouped_data = defaultdict(lambda: {"total": 0})  # Default structure for each date
 
     for date, payment_type, total_value in result:
         date_str = str(date)  # Convert date to string
-        grouped_data[date_str]["transactions"][payment_type] = float(total_value)  # Convert Decimal to int
-        grouped_data[date_str]["total"] += float(total_value)  # Update total sum
+        grouped_data[date_str][payment_type] = int(total_value)  # Store transaction
+        grouped_data[date_str]["total"] += int(total_value)  # Update total
 
-    # Convert to the expected list format
-    return [{date: data["transactions"], "total": data["total"]} for date, data in grouped_data.items()]
+    # Wrap the entire dictionary inside a list as required
+    return [grouped_data]
 
 
