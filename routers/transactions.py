@@ -135,6 +135,6 @@ async def get_calendar_transaction_list(
         grouped_data[date_str]["total"] += int(total_value)  # Update total
 
     # Wrap the entire dictionary inside a list as required
-    return [grouped_data]
+    return grouped_data
 
 
