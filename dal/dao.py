@@ -322,7 +322,8 @@ class TransactionDAO(BaseDAO):
             # func.sum(-Transactions.value)
             func.sum(Requests.sum)
         ).join(
-            Requests, Transactions.request_id == Requests.id
+            # Requests, Transactions.request_id == Requests.id
+            Transactions, Transactions.request_id == Requests.id
         ).join(
             PaymentTypes, Requests.payment_type_id == PaymentTypes.id
         ).filter(
