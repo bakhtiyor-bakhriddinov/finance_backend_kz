@@ -62,6 +62,7 @@ class CreateRequest(TunedModel):
     status: Optional[int] = 0
     sum: float
     currency: Optional[str] = None
+    exchange_rate: Optional[float] = None
     to_accounting: Optional[bool] = False
     payment_type_id: UUID
     cash: Optional[float] = None

@@ -52,7 +52,7 @@ async def get_department_list(
             )
         )[0]
         department.total_budget = budget
-        print("total_budget: ", budget)
+        # print("total_budget: ", budget)
 
     return paginate(departments)
 
@@ -60,8 +60,8 @@ async def get_department_list(
 @departments_router.get("/departments/{id}", response_model=Department)
 async def get_department(
         id: UUID,
-        start_date: Optional[date] = None,
-        finish_date: Optional[date] = None,
+        start_date: date,
+        finish_date: date,
         db: Session = Depends(get_db),
         current_user: dict = Depends(PermissionChecker(required_permissions={"Departments": ["read"]}))
 ):
@@ -70,16 +70,17 @@ async def get_department(
 
     # Group data by year
     # result_dict = defaultdict(dict)
-    result_dict = defaultdict(lambda: defaultdict(lambda: {"budget": 0.0, "expense": 0.0, "balance": 0.0}))
-    print("budget: ", budget)
+    result_dict = defaultdict(lambda: defaultdict(lambda: {"budget": 0.0, "expense": 0.0, "pending": 0.0, "balance": 0.0, "pending_requests": 0}))
+    # print("budget: ", budget)
 
-    for year, month, type, sum in budget:
-        result_dict[int(year)][int(month)][type] = -float(sum) if type == "expense" else float(sum)
+    for year, month, type, sum, pending_requests in budget:
+        result_dict[int(year)][int(month)][type] = -float(sum) if type == "expense" or type == "pending" else float(sum)
         result_dict[int(year)][int(month)]["balance"] = result_dict[int(year)][int(month)]["budget"] - result_dict[int(year)][int(month)]["expense"]
+        result_dict[int(year)][int(month)]["pending_requests"] = pending_requests
 
     # Convert defaultdict to a list of dictionaries
     department.monthly_budget = [{year: dict(months)} for year, months in result_dict.items()]
-    print(department.monthly_budget)
+    # print(department.monthly_budget)
 
     return department
 

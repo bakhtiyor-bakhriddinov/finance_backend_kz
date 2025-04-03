@@ -1,3 +1,4 @@
+from collections import defaultdict
 from datetime import date
 from typing import List, Optional
 from uuid import UUID
@@ -113,17 +114,17 @@ async def get_calendar_transaction_list(
         start_date=start_date,
         finish_date=finish_date
     )
-    print(result)
+    # print(result)
 
     # Process results into the required structure
-    grouped_data = {}
+    grouped_data = defaultdict(lambda: {"transactions": {}, "total": 0})
+
     for date, payment_type, total_value in result:
         date_str = str(date)  # Convert date to string
-        if date_str not in grouped_data:
-            grouped_data[date_str] = {}
-        grouped_data[date_str][payment_type] = int(total_value)  # Convert Decimal to int
+        grouped_data[date_str]["transactions"][payment_type] = float(total_value)  # Convert Decimal to int
+        grouped_data[date_str]["total"] += float(total_value)  # Update total sum
 
     # Convert to the expected list format
-    return [{date: transactions} for date, transactions in grouped_data.items()]
+    return [{date: data["transactions"], "total": data["total"]} for date, data in grouped_data.items()]
 
 

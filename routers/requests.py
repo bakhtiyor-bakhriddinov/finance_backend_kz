@@ -9,7 +9,7 @@ from sqlalchemy.orm import Session
 
 from core.config import settings
 from core.session import get_db
-from dal.dao import RequestDAO, InvoiceDAO, ContractDAO, FileDAO, LogDAO
+from dal.dao import RequestDAO, InvoiceDAO, ContractDAO, FileDAO, LogDAO, TransactionDAO
 from schemas.requests import Requests, Request, UpdateRequest, CreateRequest
 from utils.utils import PermissionChecker, send_telegram_message, send_telegram_document, error_sender
 
@@ -45,6 +45,16 @@ async def create_request(
             "status": 0,
             "request_id": created_request.id,
             "user_id": current_user["id"]
+        }
+    )
+
+    await TransactionDAO.add(
+        session=db,
+        **{
+            "request_id": created_request.id,
+            "status": 0,
+            "value": -created_request.sum,
+            "is_income": False
         }
     )
 
@@ -227,8 +237,9 @@ async def update_request(
             f"🛒 Закупщик: {request.buyer}\n"
             f"💰 Тип затраты: {request.expense_type.name}\n"
             f"🏢 Поставщик: {request.supplier}\n\n"
-            f"💲 Стоимость: {int(request.sum)}\n"
+            f"💲 Стоимость: {int(request.sum)} сум\n"
             f"💵 Валюта: {request.currency}\n"
+            f"📈 Курс валюты: {request.exchange_rate}\n"
             f"💳 Тип оплаты: {request.payment_type.name}\n"
             f"💳 Карта перевода: {request.payment_card if request.payment_card is not None else ''}\n"
             f"📜 № Заявки в SAP: {request.sap_code}\n\n"

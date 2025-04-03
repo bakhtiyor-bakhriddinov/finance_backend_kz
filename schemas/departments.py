@@ -12,6 +12,7 @@ class Departments(TunedModel):
     id: Optional[UUID] = None
     name: Optional[str] = None
     is_active: Optional[bool] = None
+    over_budget: Optional[bool] = None
     head: Optional[Clients] = None
     total_budget: Optional[float] = None
     created_at: Optional[datetime]

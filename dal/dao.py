@@ -63,7 +63,8 @@ class DepartmentDAO(BaseDAO):
         ).filter(
             and_(
                 Budgets.department_id == department_id,
-                Transactions.budget_id.isnot(None)
+                Transactions.budget_id.isnot(None),
+                Transactions.status == 5
             )
         )
         if start_date is not None and finish_date is not None:
@@ -81,47 +82,84 @@ class DepartmentDAO(BaseDAO):
     async def get_department_monthly_budget(cls, session: Session, department_id, start_date, finish_date):
         query = """
             SELECT 
-                EXTRACT(YEAR FROM month_series) AS year,
-                EXTRACT(MONTH FROM month_series) AS month,
+                EXTRACT(YEAR FROM budget_months.month_series) AS year,
+                EXTRACT(MONTH FROM budget_months.month_series) AS month,
                 value_type AS type,
-                SUM(value) AS sum
+                SUM(value) AS sum,
+                (
+                    SELECT 
+                        COUNT(r.id) AS value
+                    FROM transactions t
+                    INNER JOIN requests r ON t.request_id = r.id
+                    WHERE t.request_id IS NOT NULL 
+                    AND r.department_id = :department_id 
+                    AND t.status = 0 
+                    AND EXTRACT(YEAR FROM t.created_at::DATE) = EXTRACT(YEAR FROM budget_months.month_series)
+                    AND EXTRACT(MONTH FROM t.created_at::DATE) = EXTRACT(MONTH FROM budget_months.month_series)
+                ) AS pending_requests
             FROM (
-                SELECT 
-                    generate_series(b.start_date, b.finish_date, INTERVAL '1 month') AS month_series,
-                    'budget' AS value_type,
-                    t.value AS value
-                FROM transactions t
-                LEFT JOIN budgets b ON t.budget_id = b.id
-                WHERE t.budget_id IS NOT NULL 
-                AND b.department_id = :department_id
+                    SELECT 
+                        generate_series(b.start_date, b.finish_date, INTERVAL '1 month') AS month_series,
+                        'budget' AS value_type,
+                        t.value AS value
+                    FROM transactions t
+                    INNER JOIN budgets b ON t.budget_id = b.id
+                    WHERE t.budget_id IS NOT NULL 
+                    AND b.department_id = :department_id 
+                    AND t.status = 5 
+                    AND b.start_date BETWEEN :start_date AND :finish_date 
+                    AND b.finish_date BETWEEN :start_date AND :finish_date
+                
+                    UNION ALL
+                
+                    SELECT 
+                        t.created_at AS month_series,
+                        'expense' AS value_type,
+                        t.value AS value
+                    FROM transactions t
+                    INNER JOIN requests r ON t.request_id = r.id
+                    WHERE t.request_id IS NOT NULL 
+                    AND r.department_id = :department_id 
+                    AND t.status = 1 
+                    AND t.created_at::DATE BETWEEN :start_date AND :finish_date
+                    
+                    UNION ALL
+                    
+                    SELECT 
+                        t.created_at AS month_series,
+                        'pending' AS value_type,
+                        t.value AS value
+                    FROM transactions t
+                    INNER JOIN requests r ON t.request_id = r.id
+                    WHERE t.request_id IS NOT NULL 
+                    AND r.department_id = :department_id 
+                    AND t.status = 0 
+                    AND t.created_at::DATE BETWEEN :start_date AND :finish_date
             
-                UNION ALL
-            
-                SELECT 
-                    t.created_at AS month_series,
-                    'expense' AS value_type,
-                    t.value AS value
-                FROM transactions t
-                LEFT JOIN requests r ON t.request_id = r.id
-                WHERE t.request_id IS NOT NULL 
-                AND r.department_id = :department_id
-        """
-        params = {"department_id": department_id}
-
-        # Add strict filters only if dates are provided
-        if start_date is not None:
-            query += " AND b.start_date BETWEEN :start_date AND :finish_date"
-            params["start_date"] = start_date
-        if finish_date is not None:
-            query += " AND b.finish_date BETWEEN :start_date AND :finish_date"
-            params["finish_date"] = finish_date
-
-
-        query += """
             ) AS budget_months
-            GROUP BY year, month, value_type
+            GROUP BY year, month, value_type, pending_requests
             ORDER BY year, month, value_type;
         """
+        params = {
+            "department_id": department_id,
+            "start_date": start_date,
+            "finish_date": finish_date
+        }
+
+        # Add strict filters only if dates are provided
+        # if start_date is not None:
+        #     query += " AND b.start_date BETWEEN :start_date AND :finish_date"
+        #     params["start_date"] = start_date
+        # if finish_date is not None:
+        #     query += " AND b.finish_date BETWEEN :start_date AND :finish_date"
+        #     params["finish_date"] = finish_date
+
+
+        # query += """
+        #     ) AS budget_months
+        #     GROUP BY year, month, value_type
+        #     ORDER BY year, month, value_type;
+        # """
 
         result = session.execute(text(query), params).fetchall()
         return result
@@ -208,7 +246,8 @@ class BudgetDAO(BaseDAO):
         ).filter(
             and_(
                 Budgets.department_id == department_id,
-                Budgets.expense_type_id == expense_type_id
+                Budgets.expense_type_id == expense_type_id,
+                Transactions.status == 5
             )
         ).first()
         return result
