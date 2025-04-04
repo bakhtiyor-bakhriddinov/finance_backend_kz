@@ -4,6 +4,7 @@ from uuid import UUID
 
 from fastapi import APIRouter, Depends, HTTPException
 from fastapi_pagination import Page, paginate
+from sqlalchemy import func
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import Session
 
@@ -76,6 +77,8 @@ async def get_request_list(
         sap_code: Optional[str] = None,
         approved: Optional[bool] = None,
         created_at: Optional[date] = None,
+        start_date: Optional[date] = None,
+        finish_date: Optional[date] = None,
         payment_date: Optional[date] = None,
         status: Optional[str] = None,
         db: Session = Depends(get_db),
@@ -126,6 +129,8 @@ async def get_request_list(
         session=db,
         filters=filters if filters else None
     )
+    if start_date is not None and finish_date is not None:
+        query = query.filter(func.date(RequestDAO.model.created_at).between(start_date, finish_date))
     result = db.execute(query.order_by(RequestDAO.model.number.desc())).scalars().all()
     return paginate(result)
 
