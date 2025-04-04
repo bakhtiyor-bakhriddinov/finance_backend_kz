@@ -26,6 +26,7 @@ class Department(Departments):
 class CreateDepartment(TunedModel):
     name: str
     client_id: Optional[UUID] = None
+    over_budget: Optional[bool] = None
 
     # def __init__(self, /, **kwargs):
     #     # Assign all attributes normally
@@ -48,3 +49,4 @@ class UpdateDepartment(TunedModel):
     name: Optional[str] = None
     is_active: Optional[bool] = None
     client_id: Optional[UUID] = None
+    over_budget: Optional[bool] = None

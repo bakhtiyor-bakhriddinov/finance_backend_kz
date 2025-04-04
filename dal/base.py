@@ -160,14 +160,14 @@ class BaseDAO:
             query = (
                 delete(cls.model)
                 .filter_by(**filters)
-                .returning(cls.model)
+                # .returning(cls.model)
             )
             result = session.execute(query)
-            # await session.commit()
-            session.flush()
+            session.commit()
+            # session.flush()
             # deleted_objects = result.scalars().unique().all()
-            deleted_objects = result.scalars().all()
-            return deleted_objects
+            # deleted_object = result.scalars().first()
+            return True
 
         except SQLAlchemyError as e:
             session.rollback()

@@ -3,7 +3,7 @@ from datetime import date
 from typing import Optional, List
 from uuid import UUID
 
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, HTTPException
 from fastapi_pagination import Page, paginate
 from sqlalchemy.orm import Session
 
@@ -98,13 +98,15 @@ async def update_department(
     return updated_department
 
 
-@departments_router.delete("/departments", response_model=List[Departments])
+@departments_router.delete("/departments")
 async def delete_department(
         id: Optional[UUID],
         db: Session = Depends(get_db),
         current_user: dict = Depends(PermissionChecker(required_permissions={"Departments": ["delete"]}))
 ):
-    deleted_departments = await DepartmentDAO.delete(session=db, filters={"id": id})
-    db.commit()
-    return deleted_departments
-
+    deleted_department = await DepartmentDAO.delete(session=db, filters={"id": id})
+    # db.commit()
+    if deleted_department is True:
+        return {"Message": "Отдел удален успешно !"}
+    else:
+        raise HTTPException(status_code=400, detail="Данный отдел не найден !")
