@@ -9,7 +9,7 @@ from sqlalchemy.orm import Session
 from sqlalchemy.sql.functions import coalesce
 
 from core.session import get_db
-from dal.dao import RequestDAO, UserDAO
+from dal.dao import RequestDAO, UserDAO, ClientDAO
 from schemas.requests import Requests
 from utils.utils import PermissionChecker
 
@@ -22,7 +22,8 @@ accounting_router = APIRouter()
 @accounting_router.get("/accounting", response_model=Page[Requests])
 async def get_accounting(
         number: Optional[int] = None,
-        client_id: Optional[UUID] = None,
+        client: Optional[str] = None,
+        # client_id: Optional[UUID] = None,
         department_id: Optional[UUID] = None,
         supplier: Optional[str] = None,
         expense_type_id: Optional[UUID] = None,
@@ -39,8 +40,6 @@ async def get_accounting(
     filters = {}
     if number is not None:
         filters["number"] = number
-    if client_id is not None:
-        filters["client_id"] = client_id
     if department_id is not None:
         filters["department_id"] = department_id
     if supplier is not None:
@@ -63,20 +62,19 @@ async def get_accounting(
         filters["status"] = status
 
     filters["payment_type_id"] = UUID("88a747c1-5616-437c-ac71-a02b30287ee8")
-    filters["payment_time"] = None
     filters["to_accounting"] = True
+    if filters.get("payment_time", None) is None:
+        filters["payment_time"] = None
 
-    # filters = {
-    #     "payment_type_id": UUID("88a747c1-5616-437c-ac71-a02b30287ee8"),
-    #     "payment_time": None,
-    #     "status": [1, 2, 3, 5],
-    #     "to_accounting": True
-    # }
+    if client is not None:
+        query = await ClientDAO.get_all(session=db, filters={"fullname": client})
+        clients = db.execute(query).scalars().all()
+        filters["client_id"] = [client.id for client in clients]
 
-    user = await UserDAO.get_by_attributes(session=db, filters={"id": current_user["id"]}, first=True)
-    role_department_relations = user.role.roles_departments
-    role_departments = [relation.department_id for relation in role_department_relations]
     if filters.get("department_id", None) is None:
+        user = await UserDAO.get_by_attributes(session=db, filters={"id": current_user["id"]}, first=True)
+        role_department_relations = user.role.roles_departments
+        role_departments = [relation.department_id for relation in role_department_relations]
         filters["department_id"] = role_departments
 
     query = await RequestDAO.get_all(
