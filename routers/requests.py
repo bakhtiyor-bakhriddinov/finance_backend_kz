@@ -10,7 +10,7 @@ from sqlalchemy.orm import Session
 
 from core.config import settings
 from core.session import get_db
-from dal.dao import RequestDAO, InvoiceDAO, ContractDAO, FileDAO, LogDAO, TransactionDAO, UserDAO
+from dal.dao import RequestDAO, InvoiceDAO, ContractDAO, FileDAO, LogDAO, TransactionDAO, UserDAO, ClientDAO
 from schemas.requests import Requests, Request, UpdateRequest, CreateRequest, GenerateExcel
 from utils.utils import PermissionChecker, send_telegram_message, send_telegram_document, error_sender, excel_generator
 
@@ -68,7 +68,8 @@ async def create_request(
 @requests_router.get("/requests", response_model=Page[Requests])
 async def get_request_list(
         number: Optional[int] = None,
-        client_id: Optional[UUID] = None,
+        client: Optional[str] = None,
+        # client_id: Optional[UUID] = None,
         department_id: Optional[UUID] = None,
         supplier: Optional[str] = None,
         expense_type_id: Optional[UUID] = None,
@@ -87,8 +88,6 @@ async def get_request_list(
     filters = {}
     if number is not None:
         filters["number"] = number
-    if client_id is not None:
-        filters["client_id"] = client_id
     if department_id is not None:
         filters["department_id"] = department_id
     if supplier is not None:
@@ -125,10 +124,15 @@ async def get_request_list(
     # }
     # filtered_data = {k: v for k, v in data.items() if v is not None}
 
-    user = await UserDAO.get_by_attributes(session=db, filters={"id": current_user["id"]}, first=True)
-    role_department_relations = user.role.roles_departments
-    role_departments = [relation.department_id for relation in role_department_relations]
+    if client is not None:
+        query = await ClientDAO.get_all(session=db, filters={"fullname": client})
+        clients = db.execute(query).scalars().all()
+        filters["client_id"] = [client.id for client in clients]
+
     if filters.get("department_id", None) is None:
+        user = await UserDAO.get_by_attributes(session=db, filters={"id": current_user["id"]}, first=True)
+        role_department_relations = user.role.roles_departments
+        role_departments = [relation.department_id for relation in role_department_relations]
         filters["department_id"] = role_departments
 
     query = await RequestDAO.get_all(
