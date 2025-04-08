@@ -82,7 +82,7 @@ async def get_me(
 async def create_user(
         body: CreateUser,
         db: Session = Depends(get_db),
-        current_user: dict = Depends(PermissionChecker(required_permissions={"Users": ["create"]}))
+        current_user: dict = Depends(PermissionChecker(required_permissions={"Пользователи": ["create"]}))
 ):
     body_dict = body.model_dump(exclude_unset=True)
     body_dict["password"] = Hasher.get_password_hash(body.password)
@@ -97,7 +97,7 @@ async def create_user(
 async def get_user_list(
         is_active: Optional[bool] = None,
         db: Session = Depends(get_db),
-        current_user: dict = Depends(PermissionChecker(required_permissions={"Users": ["read"]}))
+        current_user: dict = Depends(PermissionChecker(required_permissions={"Пользователи": ["read"]}))
 ):
     filters = {}
     if is_active is not None:
@@ -111,7 +111,7 @@ async def get_user_list(
 async def get_user(
         id: UUID,
         db: Session = Depends(get_db),
-        current_user: dict = Depends(PermissionChecker(required_permissions={"Users": ["read"]}))
+        current_user: dict = Depends(PermissionChecker(required_permissions={"Пользователи": ["read"]}))
 ):
     user = await UserDAO.get_by_attributes(session=db, filters={"id": id}, first=True)
     user.role.permissions = [access.permission for access in user.role.accesses]
@@ -122,7 +122,7 @@ async def get_user(
 async def update_user(
         body: UpdateUser,
         db: Session = Depends(get_db),
-        current_user: dict = Depends(PermissionChecker(required_permissions={"Users": ["update"]}))
+        current_user: dict = Depends(PermissionChecker(required_permissions={"Пользователи": ["update"]}))
 ):
     body_dict = body.model_dump(exclude_unset=True)
     body_dict["password"] = Hasher.get_password_hash(body.password)

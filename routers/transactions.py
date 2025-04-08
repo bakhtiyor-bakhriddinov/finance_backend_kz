@@ -24,7 +24,7 @@ transactions_router = APIRouter()
 async def create_transaction(
         body: CreateTransaction,
         db: Session = Depends(get_db),
-        current_user: dict = Depends(PermissionChecker(required_permissions={"Transactions": ["create"]}))
+        current_user: dict = Depends(PermissionChecker(required_permissions={"Транзакции": ["create"]}))
 ):
     body_dict = body.model_dump(exclude_none=True)
 
@@ -49,7 +49,7 @@ async def get_department_transaction_list(
         page: Optional[int] = Query(1, ge=1, description="Page number for transactions"),
         size: Optional[int] = Query(50, ge=1, le=100, description="Number of transactions per page"),
         db: Session = Depends(get_db),
-        current_user: dict = Depends(PermissionChecker(required_permissions={"Transactions": ["read"]}))
+        current_user: dict = Depends(PermissionChecker(required_permissions={"Транзакции": ["read"]}))
 ):
     department = await DepartmentDAO.get_by_attributes(session=db, filters={"id": department_id}, first=True)
     transactions = await TransactionDAO.get_department_transactions(
@@ -90,7 +90,7 @@ async def get_department_transaction_list(
 async def get_budget_transaction_list(
         budget_id: Optional[UUID],
         db: Session = Depends(get_db),
-        current_user: dict = Depends(PermissionChecker(required_permissions={"Transactions": ["read"]}))
+        current_user: dict = Depends(PermissionChecker(required_permissions={"Транзакции": ["read"]}))
 ):
     transactions = await TransactionDAO.get_budget_transactions(
         session=db,
@@ -107,7 +107,7 @@ async def get_calendar_transaction_list(
         start_date: Optional[date] = None,
         finish_date: Optional[date] = None,
         db: Session = Depends(get_db),
-        current_user: dict = Depends(PermissionChecker(required_permissions={"Transactions": ["read"]}))
+        current_user: dict = Depends(PermissionChecker(required_permissions={"Транзакции": ["read"]}))
 ):
     result = await TransactionDAO.get_calendar_transactions(
         session=db,

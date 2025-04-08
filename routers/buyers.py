@@ -21,7 +21,7 @@ buyers_router = APIRouter()
 async def create_buyer(
         body: CreateBuyer,
         db: Session = Depends(get_db),
-        current_user: dict = Depends(PermissionChecker(required_permissions={"Buyers": ["create"]}))
+        current_user: dict = Depends(PermissionChecker(required_permissions={"Закупщики": ["create"]}))
 ):
     created_obj = await BuyerDAO.add(session=db, **body.model_dump())
     db.commit()
@@ -34,7 +34,7 @@ async def create_buyer(
 async def get_buyer_list(
         name: Optional[str] = None,
         db: Session = Depends(get_db),
-        current_user: dict = Depends(PermissionChecker(required_permissions={"Buyers": ["read"]}))
+        current_user: dict = Depends(PermissionChecker(required_permissions={"Закупщики": ["read"]}))
 ):
     filters = {}
     if name is not None:
@@ -49,7 +49,7 @@ async def get_buyer_list(
 async def get_buyer(
         id: UUID,
         db: Session = Depends(get_db),
-        current_user: dict = Depends(PermissionChecker(required_permissions={"Buyers": ["read"]}))
+        current_user: dict = Depends(PermissionChecker(required_permissions={"Закупщики": ["read"]}))
 ):
     obj = await BuyerDAO.get_by_attributes(session=db, filters={"id": id}, first=True)
     return obj
@@ -60,7 +60,7 @@ async def get_buyer(
 async def update_buyer(
         body: UpdateBuyer,
         db: Session = Depends(get_db),
-        current_user: dict = Depends(PermissionChecker(required_permissions={"Buyers": ["update"]}))
+        current_user: dict = Depends(PermissionChecker(required_permissions={"Закупщики": ["update"]}))
 ):
     body_dict = body.model_dump(exclude_unset=True)
     updated_obj = await BuyerDAO.update(session=db, data=body_dict)
@@ -74,7 +74,7 @@ async def update_buyer(
 async def delete_buyer(
         id: Optional[UUID],
         db: Session = Depends(get_db),
-        current_user: dict = Depends(PermissionChecker(required_permissions={"Buyers": ["delete"]}))
+        current_user: dict = Depends(PermissionChecker(required_permissions={"Закупщики": ["delete"]}))
 ):
     deleted_objs = await BuyerDAO.delete(session=db, filters={"id": id})
     db.commit()

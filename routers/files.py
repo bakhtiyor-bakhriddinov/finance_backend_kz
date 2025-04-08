@@ -24,7 +24,7 @@ files_router = APIRouter()
 async def upload_files(
         files: List[UploadFile] = File(...),
         # db: Session = Depends(get_db),
-        current_user: dict = Depends(PermissionChecker(required_permissions={"Files": ["create"]}))
+        current_user: dict = Depends(PermissionChecker(required_permissions={"Файлы": ["create"]}))
 ):
     base_dir = "files"
     date_dir = datetime.now().strftime("%Y/%m/%d")  # Create a path like "2025/03/10"
@@ -50,7 +50,7 @@ async def upload_files(
 async def upload_bot_files(
         file: UploadFile = File(...),
         # db: Session = Depends(get_db),
-        current_user: dict = Depends(PermissionChecker(required_permissions={"Files": ["create"]}))
+        current_user: dict = Depends(PermissionChecker(required_permissions={"Файлы": ["create"]}))
 ):
     base_dir = "files"
     date_dir = datetime.now().strftime("%Y/%m/%d")  # Create a path like "2025/03/10"

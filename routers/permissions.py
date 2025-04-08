@@ -20,7 +20,7 @@ permissions_router = APIRouter()
 @permissions_router.get("/permission-groups", response_model=List[GetPermissionGroup])
 async def get_permission_group_list(
         db: Session = Depends(get_db),
-        current_user: dict = Depends(PermissionChecker(required_permissions={"Permissions": ["read"]}))
+        current_user: dict = Depends(PermissionChecker(required_permissions={"Разрешения": ["read"]}))
 ):
     permission_groups = await PermissionGroupDAO.get_by_attributes(session=db)
     return permission_groups
@@ -31,7 +31,7 @@ async def get_permission_group_list(
 async def get_permission_list(
         permission_group: Optional[UUID] = None,
         db: Session = Depends(get_db),
-        current_user: dict = Depends(PermissionChecker(required_permissions={"Permissions": ["read"]}))
+        current_user: dict = Depends(PermissionChecker(required_permissions={"Разрешения": ["read"]}))
 ):
     filters = {}
     if permission_group is not None:

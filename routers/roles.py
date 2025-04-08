@@ -19,7 +19,7 @@ roles_router = APIRouter()
 async def create_role(
         body: CreateRole,
         db: Session = Depends(get_db),
-        current_user: dict = Depends(PermissionChecker(required_permissions={"Roles": ["create"]}))
+        current_user: dict = Depends(PermissionChecker(required_permissions={"Роли": ["create"]}))
 ):
     permissions = body.permissions
     departments = body.departments
@@ -57,7 +57,7 @@ async def create_role(
 async def get_role(
         id: UUID,
         db: Session = Depends(get_db),
-        current_user: dict = Depends(PermissionChecker(required_permissions={"Roles": ["read"]}))
+        current_user: dict = Depends(PermissionChecker(required_permissions={"Роли": ["read"]}))
 ):
     role = await RoleDAO.get_by_attributes(session=db, filters={"id": id}, first=True)
     role.permissions = [access.permission for access in role.accesses]
@@ -79,7 +79,7 @@ async def get_role(
 @roles_router.get("/roles", response_model=List[GetRoles])
 async def get_role_list(
         db: Session = Depends(get_db),
-        current_user: dict = Depends(PermissionChecker(required_permissions={"Roles": ["read"]}))
+        current_user: dict = Depends(PermissionChecker(required_permissions={"Роли": ["read"]}))
 ):
     roles = await RoleDAO.get_by_attributes(session=db)
     return roles
@@ -90,7 +90,7 @@ async def get_role_list(
 async def update_role(
         body: UpdateRole,
         db: Session = Depends(get_db),
-        current_user: dict = Depends(PermissionChecker(required_permissions={"Roles": ["update"]}))
+        current_user: dict = Depends(PermissionChecker(required_permissions={"Роли": ["update"]}))
 ):
     permissions = body.permissions
     departments = body.departments

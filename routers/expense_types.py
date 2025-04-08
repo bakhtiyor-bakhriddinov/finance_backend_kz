@@ -21,7 +21,7 @@ expense_types_router = APIRouter()
 async def create_expense_type(
         body: CreateExpenseType,
         db: Session = Depends(get_db),
-        current_user: dict = Depends(PermissionChecker(required_permissions={"ExpenseTypes": ["create"]}))
+        current_user: dict = Depends(PermissionChecker(required_permissions={"Типы расходов": ["create"]}))
 ):
     created_obj = await ExpenseTypeDAO.add(session=db, **body.model_dump())
     db.commit()
@@ -33,7 +33,7 @@ async def create_expense_type(
 async def get_expense_type_list(
         name: Optional[str] = None,
         db: Session = Depends(get_db),
-        current_user: dict = Depends(PermissionChecker(required_permissions={"ExpenseTypes": ["read", "accounting"]}))
+        current_user: dict = Depends(PermissionChecker(required_permissions={"Типы расходов": ["read", "accounting"]}))
 ):
     filters = {}
     if name is not None:
@@ -47,7 +47,7 @@ async def get_expense_type_list(
 async def get_expense_type(
         id: UUID,
         db: Session = Depends(get_db),
-        current_user: dict = Depends(PermissionChecker(required_permissions={"ExpenseTypes": ["read"]}))
+        current_user: dict = Depends(PermissionChecker(required_permissions={"Типы расходов": ["read"]}))
 ):
     obj = await ExpenseTypeDAO.get_by_attributes(session=db, filters={"id": id}, first=True)
     return obj
@@ -57,7 +57,7 @@ async def get_expense_type(
 async def update_expense_type(
         body: UpdateExpenseType,
         db: Session = Depends(get_db),
-        current_user: dict = Depends(PermissionChecker(required_permissions={"ExpenseTypes": ["update"]}))
+        current_user: dict = Depends(PermissionChecker(required_permissions={"Типы расходов": ["update"]}))
 ):
     body_dict = body.model_dump(exclude_unset=True)
     updated_obj = await ExpenseTypeDAO.update(session=db, data=body_dict)
@@ -70,7 +70,7 @@ async def update_expense_type(
 async def delete_expense_type(
         id: Optional[UUID],
         db: Session = Depends(get_db),
-        current_user: dict = Depends(PermissionChecker(required_permissions={"ExpenseTypes": ["delete"]}))
+        current_user: dict = Depends(PermissionChecker(required_permissions={"Типы расходов": ["delete"]}))
 ):
     deleted_objs = await ExpenseTypeDAO.delete(session=db, filters={"id": id})
     db.commit()

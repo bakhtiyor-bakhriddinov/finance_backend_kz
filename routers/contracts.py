@@ -18,7 +18,7 @@ contracts_router = APIRouter()
 async def create_contract(
         body: CreateContract,
         db: Session = Depends(get_db),
-        current_user: dict = Depends(PermissionChecker(required_permissions={"Contracts": ["create"]}))
+        current_user: dict = Depends(PermissionChecker(required_permissions={"Контракты": ["create"]}))
 ):
     created_obj = await ContractDAO.add(session=db, **body.model_dump())
     db.commit()
@@ -30,7 +30,7 @@ async def create_contract(
 # @contracts_router.get("/contracts", response_model=List[Suppliers])
 # async def get_contract_list(
 #         db: AsyncSession = Depends(get_db),
-#         current_user: dict = Depends(PermissionChecker(required_permissions={"Contracts": ["read"]}))
+#         current_user: dict = Depends(PermissionChecker(required_permissions={"Контракты": ["read"]}))
 # ):
 #     objs = await SupplierDAO.get_all(session=db)
 #     return objs
@@ -41,7 +41,7 @@ async def create_contract(
 async def get_contract(
         id: UUID,
         db: Session = Depends(get_db),
-        current_user: dict = Depends(PermissionChecker(required_permissions={"Contracts": ["read"]}))
+        current_user: dict = Depends(PermissionChecker(required_permissions={"Контракты": ["read"]}))
 ):
     obj = await ContractDAO.get_by_attributes(session=db, filters={"id": id}, first=True)
     return obj

@@ -19,7 +19,7 @@ payment_types_router = APIRouter()
 async def create_payment_type(
         body: CreatePaymentType,
         db: Session = Depends(get_db),
-        current_user: dict = Depends(PermissionChecker(required_permissions={"PaymentTypes": ["create"]}))
+        current_user: dict = Depends(PermissionChecker(required_permissions={"Типы оплаты": ["create"]}))
 ):
     created_obj = await PaymentTypeDAO.add(session=db, **body.model_dump())
     db.commit()
@@ -31,7 +31,7 @@ async def create_payment_type(
 async def get_payment_type_list(
         name: Optional[str] = None,
         db: Session = Depends(get_db),
-        current_user: dict = Depends(PermissionChecker(required_permissions={"PaymentTypes": ["read", "accounting"]}))
+        current_user: dict = Depends(PermissionChecker(required_permissions={"Типы оплаты": ["read", "accounting"]}))
 ):
     filters = {}
     if name is not None:
@@ -45,7 +45,7 @@ async def get_payment_type_list(
 async def get_payment_type(
         id: UUID,
         db: Session = Depends(get_db),
-        current_user: dict = Depends(PermissionChecker(required_permissions={"PaymentTypes": ["read"]}))
+        current_user: dict = Depends(PermissionChecker(required_permissions={"Типы оплаты": ["read"]}))
 ):
     obj = await PaymentTypeDAO.get_by_attributes(session=db, filters={"id": id}, first=True)
     return obj
@@ -55,7 +55,7 @@ async def get_payment_type(
 async def update_payment_type(
         body: UpdatePaymentType,
         db: Session = Depends(get_db),
-        current_user: dict = Depends(PermissionChecker(required_permissions={"PaymentTypes": ["update"]}))
+        current_user: dict = Depends(PermissionChecker(required_permissions={"Типы оплаты": ["update"]}))
 ):
     body_dict = body.model_dump(exclude_unset=True)
     updated_obj = await PaymentTypeDAO.update(session=db, data=body_dict)
@@ -68,7 +68,7 @@ async def update_payment_type(
 async def delete_payment_type(
         id: Optional[UUID],
         db: Session = Depends(get_db),
-        current_user: dict = Depends(PermissionChecker(required_permissions={"PaymentTypes": ["delete"]}))
+        current_user: dict = Depends(PermissionChecker(required_permissions={"Типы оплаты": ["delete"]}))
 ):
     deleted_objs = await PaymentTypeDAO.delete(session=db, filters={"id": id})
     db.commit()

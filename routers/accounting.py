@@ -35,7 +35,7 @@ async def get_accounting(
         payment_date: Optional[date] = None,
         status: Optional[str] = "1,2,3,5",
         db: Session = Depends(get_db),
-        current_user: dict = Depends(PermissionChecker(required_permissions={"Requests": ["accounting"]}))
+        current_user: dict = Depends(PermissionChecker(required_permissions={"Заявки": ["accounting"]}))
 ):
     filters = {}
     if number is not None:

@@ -20,7 +20,7 @@ clients_router = APIRouter()
 async def create_client(
         body: CreateClient,
         db: Session = Depends(get_db),
-        current_user: dict = Depends(PermissionChecker(required_permissions={"Clients": ["create"]}))
+        current_user: dict = Depends(PermissionChecker(required_permissions={"Клиенты": ["create"]}))
 ):
     obj = await ClientDAO.add(session=db, **body.model_dump())
     db.commit()
@@ -35,7 +35,7 @@ async def get_client_list(
         tg_id: Optional[int] = None,
         is_active: Optional[bool] = None,
         db: Session = Depends(get_db),
-        current_user: dict = Depends(PermissionChecker(required_permissions={"Clients": ["read", "accounting"]}))
+        current_user: dict = Depends(PermissionChecker(required_permissions={"Клиенты": ["read", "accounting"]}))
 ):
     filters = {}
     if fullname is not None:
@@ -57,7 +57,7 @@ async def get_client_list(
 async def get_client(
         id: UUID,
         db: Session = Depends(get_db),
-        current_user: dict = Depends(PermissionChecker(required_permissions={"Clients": ["read"]}))
+        current_user: dict = Depends(PermissionChecker(required_permissions={"Клиенты": ["read"]}))
 ):
     obj = await ClientDAO.get_by_attributes(session=db, filters={"id": id}, first=True)
     return obj
@@ -68,7 +68,7 @@ async def get_client(
 async def update_client(
         body: UpdateClient,
         db: Session = Depends(get_db),
-        current_user: dict = Depends(PermissionChecker(required_permissions={"Clients": ["update"]}))
+        current_user: dict = Depends(PermissionChecker(required_permissions={"Клиенты": ["update"]}))
 ):
     body_dict = body.model_dump(exclude_unset=True)
     updated_obj = await ClientDAO.update(session=db, data=body_dict)

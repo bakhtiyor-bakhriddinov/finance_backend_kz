@@ -19,7 +19,7 @@ budgets_router = APIRouter()
 async def create_budget(
         body: CreateBudget,
         db: Session = Depends(get_db),
-        current_user: dict = Depends(PermissionChecker(required_permissions={"Budgets": ["create"]}))
+        current_user: dict = Depends(PermissionChecker(required_permissions={"Бюджеты": ["create"]}))
 ):
     created_obj = await BudgetDAO.add(session=db, **body.model_dump())
     db.commit()
@@ -34,7 +34,7 @@ async def get_budget_list(
         start_date: date,
         finish_date: date,
         db: Session = Depends(get_db),
-        current_user: dict = Depends(PermissionChecker(required_permissions={"Budgets": ["read"]}))
+        current_user: dict = Depends(PermissionChecker(required_permissions={"Бюджеты": ["read"]}))
 ):
     filters = {
         "department_id": department_id,
@@ -55,7 +55,7 @@ async def get_budget_balance(
         department_id: UUID,
         expense_type_id: UUID,
         db: Session = Depends(get_db),
-        current_user: dict = Depends(PermissionChecker(required_permissions={"Budgets": ["read"]}))
+        current_user: dict = Depends(PermissionChecker(required_permissions={"Бюджеты": ["read"]}))
 ):
     filters = {
         "department_id": department_id,

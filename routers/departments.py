@@ -20,7 +20,7 @@ departments_router = APIRouter()
 async def create_department(
         body: CreateDepartment,
         db: Session = Depends(get_db),
-        current_user: dict = Depends(PermissionChecker(required_permissions={"Departments": ["create"]}))
+        current_user: dict = Depends(PermissionChecker(required_permissions={"Отделы": ["create"]}))
 ):
     body_dict = body.model_dump(exclude_unset=True)
     body_dict.pop("role_ids", None)
@@ -52,7 +52,7 @@ async def get_department_list(
         start_date: Optional[date] = None,
         finish_date: Optional[date] = None,
         db: Session = Depends(get_db),
-        current_user: dict = Depends(PermissionChecker(required_permissions={"Departments": ["read", "accounting"]}))
+        current_user: dict = Depends(PermissionChecker(required_permissions={"Отделы": ["read", "accounting"]}))
 ):
     filters = {}
     if name is not None:
@@ -82,7 +82,7 @@ async def get_department(
         start_date: date,
         finish_date: date,
         db: Session = Depends(get_db),
-        current_user: dict = Depends(PermissionChecker(required_permissions={"Departments": ["read"]}))
+        current_user: dict = Depends(PermissionChecker(required_permissions={"Отделы": ["read"]}))
 ):
     department = await DepartmentDAO.get_by_attributes(session=db, filters={"id": id}, first=True)
     if department is None:
@@ -110,7 +110,7 @@ async def get_department(
 async def update_department(
         body: UpdateDepartment,
         db: Session = Depends(get_db),
-        current_user: dict = Depends(PermissionChecker(required_permissions={"Departments": ["update"]}))
+        current_user: dict = Depends(PermissionChecker(required_permissions={"Отделы": ["update"]}))
 ):
     body_dict = body.model_dump(exclude_unset=True)
     updated_department = await DepartmentDAO.update(session=db, data=body_dict)
@@ -123,7 +123,7 @@ async def update_department(
 async def delete_department(
         id: Optional[UUID],
         db: Session = Depends(get_db),
-        current_user: dict = Depends(PermissionChecker(required_permissions={"Departments": ["delete"]}))
+        current_user: dict = Depends(PermissionChecker(required_permissions={"Отделы": ["delete"]}))
 ):
     deleted_department = await DepartmentDAO.delete(session=db, filters={"id": id})
     # db.commit()

@@ -20,7 +20,7 @@ logs_router = APIRouter()
 async def create_log(
         body: CreateLog,
         db: Session = Depends(get_db),
-        current_user: dict = Depends(PermissionChecker(required_permissions={"Logs": ["create"]}))
+        current_user: dict = Depends(PermissionChecker(required_permissions={"Логи": ["create"]}))
 ):
     created_obj = await LogDAO.add(session=db, **body.model_dump())
     db.commit()
@@ -33,7 +33,7 @@ async def create_log(
 # async def get_request_logs(
 #         request_id: UUID,
 #         db: AsyncSession = Depends(get_db),
-#         current_user: dict = Depends(PermissionChecker(required_permissions={"Logs": ["read"]}))
+#         current_user: dict = Depends(PermissionChecker(required_permissions={"Логи": ["read"]}))
 # ):
 #     objs = await LogDAO.get_all(session=db, filters={"request_id": request_id})
 #     return objs
@@ -44,7 +44,7 @@ async def create_log(
 # async def get_log(
 #         id: UUID,
 #         db: AsyncSession = Depends(get_db),
-#         current_user: dict = Depends(PermissionChecker(required_permissions={"Logs": ["read"]}))
+#         current_user: dict = Depends(PermissionChecker(required_permissions={"Логи": ["read"]}))
 # ):
 #     obj = await LogDAO.get_by_attributes(session=db, filters={"id": id}, first=True)
 #     return obj

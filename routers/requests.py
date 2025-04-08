@@ -23,7 +23,7 @@ requests_router = APIRouter()
 async def create_request(
         body: CreateRequest,
         db: Session = Depends(get_db),
-        current_user: dict = Depends(PermissionChecker(required_permissions={"Requests": ["create"]}))
+        current_user: dict = Depends(PermissionChecker(required_permissions={"Заявки": ["create"]}))
 ):
     body_dict = body.model_dump(exclude_unset=True)
     body_dict.pop("file_paths", None)
@@ -83,7 +83,7 @@ async def get_request_list(
         payment_date: Optional[date] = None,
         status: Optional[str] = None,
         db: Session = Depends(get_db),
-        current_user: dict = Depends(PermissionChecker(required_permissions={"Requests": ["read"]}))
+        current_user: dict = Depends(PermissionChecker(required_permissions={"Заявки": ["read"]}))
 ):
     filters = {}
     if number is not None:
@@ -152,7 +152,7 @@ async def get_request_list(
 async def get_request(
         id: UUID,
         db: Session = Depends(get_db),
-        current_user: dict = Depends(PermissionChecker(required_permissions={"Requests": ["read", "accounting"]}))
+        current_user: dict = Depends(PermissionChecker(required_permissions={"Заявки": ["read", "accounting"]}))
 ):
     obj = await RequestDAO.get_by_attributes(session=db, filters={"id": id}, first=True)
     return obj
@@ -163,7 +163,7 @@ async def get_request(
 async def update_request(
         body: UpdateRequest,
         db: Session = Depends(get_db),
-        current_user: dict = Depends(PermissionChecker(required_permissions={"Requests": ["update", "accounting 2"]}))
+        current_user: dict = Depends(PermissionChecker(required_permissions={"Заявки": ["update", "accounting 2"]}))
 ):
     body_dict = body.model_dump(exclude_unset=True)
     body_dict.pop("file_paths", None)
@@ -323,7 +323,7 @@ async def update_request(
 async def get_excel_file(
         body : GenerateExcel,
         db: Session = Depends(get_db),
-        current_user: dict = Depends(PermissionChecker(required_permissions={"Requests": ["read"]}))
+        current_user: dict = Depends(PermissionChecker(required_permissions={"Заявки": ["read"]}))
 ):
     query = await RequestDAO.get_excel(session=db, start_date=body.start_date, finish_date=body.finish_date)
     file_name = excel_generator(data=query)

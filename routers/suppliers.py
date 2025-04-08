@@ -21,7 +21,7 @@ suppliers_router = APIRouter()
 async def create_supplier(
         body: CreateSupplier,
         db: Session = Depends(get_db),
-        current_user: dict = Depends(PermissionChecker(required_permissions={"Suppliers": ["create"]}))
+        current_user: dict = Depends(PermissionChecker(required_permissions={"Поставщики": ["create"]}))
 ):
     created_obj = await SupplierDAO.add(session=db, **body.model_dump())
     db.commit()
@@ -34,7 +34,7 @@ async def create_supplier(
 async def get_supplier_list(
         name: Optional[str] = None,
         db: Session = Depends(get_db),
-        current_user: dict = Depends(PermissionChecker(required_permissions={"Suppliers": ["read"]}))
+        current_user: dict = Depends(PermissionChecker(required_permissions={"Поставщики": ["read"]}))
 ):
     filters = {}
     if name is not None:
@@ -48,7 +48,7 @@ async def get_supplier_list(
 async def get_supplier(
         id: UUID,
         db: Session = Depends(get_db),
-        current_user: dict = Depends(PermissionChecker(required_permissions={"Suppliers": ["read"]}))
+        current_user: dict = Depends(PermissionChecker(required_permissions={"Поставщики": ["read"]}))
 ):
     obj = await SupplierDAO.get_by_attributes(session=db, filters={"id": id}, first=True)
     return obj
@@ -59,7 +59,7 @@ async def get_supplier(
 async def update_supplier(
         body: UpdateSupplier,
         db: Session = Depends(get_db),
-        current_user: dict = Depends(PermissionChecker(required_permissions={"Suppliers": ["update"]}))
+        current_user: dict = Depends(PermissionChecker(required_permissions={"Поставщики": ["update"]}))
 ):
     body_dict = body.model_dump(exclude_unset=True)
     updated_obj = await SupplierDAO.update(session=db, data=body_dict)
@@ -73,7 +73,7 @@ async def update_supplier(
 async def delete_supplier(
         id: Optional[UUID],
         db: Session = Depends(get_db),
-        current_user: dict = Depends(PermissionChecker(required_permissions={"Suppliers": ["delete"]}))
+        current_user: dict = Depends(PermissionChecker(required_permissions={"Поставщики": ["delete"]}))
 ):
     deleted_objs = await SupplierDAO.delete(session=db, filters={"id": id})
     db.commit()
