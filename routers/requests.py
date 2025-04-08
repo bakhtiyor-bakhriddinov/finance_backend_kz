@@ -171,13 +171,13 @@ async def update_request(
     request = await RequestDAO.get_by_attributes(session=db, filters={"id": body.id}, first=True)
     request_payment_time = request.payment_time
     if body.status == 4:
-        if "reject" not in current_user["permissions"]["Requests"]:
+        if "reject" not in current_user["permissions"]["Заявки"]:
             body_dict.pop("status", None)
             body_dict.pop("comment", None)
             raise HTTPException(status_code=404, detail="У вас нет прав отменить статус заявки !")
 
     if body.approved is True:
-        if "approve" not in current_user["permissions"]["Requests"]:
+        if "approve" not in current_user["permissions"]["Заявки"]:
             body_dict.pop("approved", None)
             body_dict.pop("approve_comment", None)
             raise HTTPException(status_code=404, detail="У вас нет прав одобрить заявку !")
