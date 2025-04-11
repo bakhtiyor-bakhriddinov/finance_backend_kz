@@ -121,7 +121,7 @@ class DepartmentDAO(BaseDAO):
                     INNER JOIN requests r ON t.request_id = r.id
                     WHERE t.request_id IS NOT NULL 
                     AND r.department_id = :department_id 
-                    AND t.status = 1 
+                    AND t.status IN (1, 2, 3, 5) 
                     AND t.created_at::DATE BETWEEN :start_date AND :finish_date
                     
                     UNION ALL
