@@ -345,38 +345,38 @@ class TransactionDAO(BaseDAO):
 
     @classmethod
     async def get_calendar_transactions(cls, session: Session, start_date, finish_date):
-        # result = session.query(
-        #     func.date(Requests.payment_time),
-        #     PaymentTypes.name,
-        #     func.sum(-Transactions.value)
-        # ).join(
-        #     Requests, Transactions.request_id == Requests.id
-        # ).join(
-        #     PaymentTypes, Requests.payment_type_id == PaymentTypes.id
-        # ).filter(
-        #     and_(
-        #         func.date(Requests.payment_time).between(start_date, finish_date),
-        #         Transactions.status.in_([1, 2, 3, 5])
-        #     )
-        # ).group_by(
-        #     func.date(Requests.payment_time),
-        #     PaymentTypes.name
-        # ).all()
-
         result = session.query(
             func.date(Requests.payment_time),
             PaymentTypes.name,
-            func.sum(Requests.sum)
+            func.sum(-Transactions.value)
+        ).join(
+            Requests, Transactions.request_id == Requests.id
         ).join(
             PaymentTypes, Requests.payment_type_id == PaymentTypes.id
         ).filter(
             and_(
                 func.date(Requests.payment_time).between(start_date, finish_date),
-                Requests.status.in_([1, 2, 3, 5])
+                Transactions.status.in_([1, 2, 3, 5])
             )
         ).group_by(
             func.date(Requests.payment_time),
             PaymentTypes.name
         ).all()
+
+        # result = session.query(
+        #     func.date(Requests.payment_time),
+        #     PaymentTypes.name,
+        #     func.sum(Requests.sum)
+        # ).join(
+        #     PaymentTypes, Requests.payment_type_id == PaymentTypes.id
+        # ).filter(
+        #     and_(
+        #         func.date(Requests.payment_time).between(start_date, finish_date),
+        #         Requests.status.in_([1, 2, 3, 5])
+        #     )
+        # ).group_by(
+        #     func.date(Requests.payment_time),
+        #     PaymentTypes.name
+        # ).all()
 
         return result
