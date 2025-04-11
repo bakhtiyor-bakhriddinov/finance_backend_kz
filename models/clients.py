@@ -17,6 +17,7 @@ class Clients(Base):
     is_active = Column(Boolean, default=True)
     requests = relationship('Requests', back_populates='client', passive_deletes=True) # lazy='select'
     department = relationship('Departments', back_populates='head', passive_deletes=True)  # uselist=False, lazy='select'
+    logs = relationship('Logs', back_populates='client', passive_deletes=True)
     created_at = Column(DateTime(timezone=True), default=func.now())
     updated_at = Column(DateTime(timezone=True), onupdate=func.now())
 

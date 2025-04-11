@@ -170,6 +170,7 @@ async def update_request(
     body_dict = body.model_dump(exclude_unset=True)
     body_dict.pop("file_paths", None)
     body_dict.pop("invoice", None)
+    body_dict.pop("client_id", None)
     request = await RequestDAO.get_by_attributes(session=db, filters={"id": body.id}, first=True)
     request_payment_time = request.payment_time
     if body.status == 4:
@@ -231,6 +232,22 @@ async def update_request(
         db.refresh(updated_request)
 
     if body.approved is True:
+        insert_data = {
+            "request_id": updated_request.id,
+            "approved": updated_request.approved,
+        }
+        if body.client_id is not None:
+            insert_data["client_id"] = body.client_id
+        else:
+            insert_data["user_id"] = current_user["id"]
+
+        await LogDAO.add(
+            session=db,
+            **insert_data
+        )
+        db.commit()
+        db.refresh(updated_request)
+
         chat_id = updated_request.client.tg_id
         number = updated_request.number
         message_text = f"Ваша заявка #{number}s одобрена !"
@@ -240,14 +257,19 @@ async def update_request(
             print("Sending Error: ", e)
 
     if body.status is not None:
+        insert_data = {
+            "status": body.status,
+            "request_id": updated_request.id
+        }
+        if body.client_id is not None:
+            insert_data["client_id"] = body.client_id
+        else:
+            insert_data["user_id"] = current_user["id"]
+
         # create logs
         await LogDAO.add(
             session=db,
-            **{
-                "status": body.status,
-                "request_id": updated_request.id,
-                "user_id": current_user["id"]
-            }
+            **insert_data
         )
         db.commit()
         db.refresh(updated_request)

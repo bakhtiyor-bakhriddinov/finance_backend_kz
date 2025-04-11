@@ -3,7 +3,6 @@ from typing import Optional, List
 from uuid import UUID
 
 from schemas.base_model import TunedModel
-from schemas.buyers import Buyers
 from schemas.clients import Clients
 from schemas.contracts import Contract
 from schemas.departments import Departments
@@ -11,7 +10,6 @@ from schemas.expense_types import ExpenseTypes
 from schemas.invoices import Invoice
 from schemas.logs import Log
 from schemas.payment_types import PaymentTypes
-from schemas.suppliers import Suppliers
 
 
 class Requests(TunedModel):
@@ -85,6 +83,7 @@ class UpdateRequest(TunedModel):
     payer_company: Optional[str] = None
     invoice: Optional[bool] = None
     file_paths: List[str] = None
+    client_id: Optional[UUID] = None
 
 
 
