@@ -30,12 +30,11 @@ class Requests(TunedModel):
     payment_card: Optional[str] = None
     description: Optional[str] = None
     currency: Optional[str] = None
-
+    exchange_rate: Optional[float] = None
 
 
 class Request(Requests):
     currency_sum: Optional[float] = None
-    exchange_rate: Optional[float] = None
     comment: Optional[str] = None
     to_accounting: Optional[bool] = None
     approve_comment: Optional[str] = None
