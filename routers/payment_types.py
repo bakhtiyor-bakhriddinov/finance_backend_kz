@@ -31,7 +31,7 @@ async def create_payment_type(
 async def get_payment_type_list(
         name: Optional[str] = None,
         db: Session = Depends(get_db),
-        current_user: dict = Depends(PermissionChecker(required_permissions={"Типы оплаты": ["read", "accounting"]}))
+        current_user: dict = Depends(PermissionChecker(required_permissions={"Типы оплаты": ["read", "accounting", "transfer"]}))
 ):
     filters = {}
     if name is not None:

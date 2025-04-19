@@ -52,7 +52,7 @@ async def get_department_list(
         start_date: Optional[date] = None,
         finish_date: Optional[date] = None,
         db: Session = Depends(get_db),
-        current_user: dict = Depends(PermissionChecker(required_permissions={"Отделы": ["read", "accounting"]}))
+        current_user: dict = Depends(PermissionChecker(required_permissions={"Отделы": ["read", "accounting", "transfer"]}))
 ):
     filters = {}
     if name is not None:

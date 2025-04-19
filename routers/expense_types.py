@@ -33,7 +33,7 @@ async def create_expense_type(
 async def get_expense_type_list(
         name: Optional[str] = None,
         db: Session = Depends(get_db),
-        current_user: dict = Depends(PermissionChecker(required_permissions={"Типы расходов": ["read", "accounting"]}))
+        current_user: dict = Depends(PermissionChecker(required_permissions={"Типы расходов": ["read", "accounting", "transfer"]}))
 ):
     filters = {}
     if name is not None:
