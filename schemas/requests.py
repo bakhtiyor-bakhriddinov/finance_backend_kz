@@ -37,6 +37,7 @@ class Request(Requests):
     currency_sum: Optional[float] = None
     comment: Optional[str] = None
     to_accounting: Optional[bool] = None
+    to_transfer: Optional[bool] = None
     approve_comment: Optional[str] = None
     payer_company: Optional[str] = None
     contract: Optional[Contract] = None
@@ -48,8 +49,6 @@ class Request(Requests):
 class CreateRequest(TunedModel):
     department_id: UUID
     expense_type_id: UUID
-    # buyer_id: UUID
-    # supplier_id: UUID
     buyer: str
     supplier: str
     client_id: UUID
@@ -72,6 +71,7 @@ class UpdateRequest(TunedModel):
     id: UUID
     approved: Optional[bool] = None
     to_accounting: Optional[bool] = None
+    to_transfer: Optional[bool] = None
     approve_comment: Optional[str] = None
     status: Optional[int] = None
     payment_time: Optional[date] = None

@@ -15,15 +15,15 @@ from utils.utils import PermissionChecker
 
 
 
-accounting_router = APIRouter()
+
+transfers_router = APIRouter()
 
 
 
-@accounting_router.get("/accounting", response_model=Page[Requests])
-async def get_accounting(
+@transfers_router.get("/transfers", response_model=Page[Requests])
+async def get_transfers(
         number: Optional[int] = None,
         client: Optional[str] = None,
-        # client_id: Optional[UUID] = None,
         department_id: Optional[UUID] = None,
         supplier: Optional[str] = None,
         expense_type_id: Optional[UUID] = None,
@@ -35,7 +35,7 @@ async def get_accounting(
         payment_date: Optional[date] = None,
         status: Optional[str] = "1,2,3,5",
         db: Session = Depends(get_db),
-        current_user: dict = Depends(PermissionChecker(required_permissions={"Заявки": ["accounting"]}))
+        current_user: dict = Depends(PermissionChecker(required_permissions={"Заявки": ["transfer"]}))
 ):
     filters = {}
     if number is not None:
@@ -61,8 +61,8 @@ async def get_accounting(
     if status is not None:
         filters["status"] = status
 
-    filters["payment_type_id"] = UUID("88a747c1-5616-437c-ac71-a02b30287ee8")
-    filters["to_accounting"] = True
+    filters["payment_type_id"] = UUID('eda54dd2-2eef-430e-ae4e-0c4d68a44298')
+    filters["to_transfer"] = True
     if filters.get("payment_time", None) is None:
         filters["payment_time"] = None
 

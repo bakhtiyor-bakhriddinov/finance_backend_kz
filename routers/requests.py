@@ -178,6 +178,7 @@ async def update_request(
     body_dict.pop("client_id", None)
     request = await RequestDAO.get_by_attributes(session=db, filters={"id": body.id}, first=True)
     request_payment_time = request.payment_time
+    
     if body.status == 4:
         if "reject" not in current_user["permissions"]["Заявки"]:
             body_dict.pop("status", None)
@@ -196,11 +197,24 @@ async def update_request(
             body_dict.pop("to_accounting", None)
             raise HTTPException(status_code=404, detail="Тип оплаты не является перечислением !")
 
-    if request.payment_type_id == UUID("88a747c1-5616-437c-ac71-a02b30287ee8"):
-        if body.status == 5:
+    if body.to_transfer is True:
+        if request.payment_type_id != UUID("eda54dd2-2eef-430e-ae4e-0c4d68a44298"):
+            body_dict.pop("to_transfer", None)
+            raise HTTPException(status_code=404, detail="Тип оплаты не является переводом !")
+
+    if body.status == 5:
+        if request.payment_type_id == UUID("88a747c1-5616-437c-ac71-a02b30287ee8"):
             if request.to_accounting is False:
                 body_dict.pop("status", None)
                 raise HTTPException(status_code=404, detail="Сначала отправьте в бухгалтерию !")
+            if request.invoice is None:
+                body_dict.pop("status", None)
+                raise HTTPException(status_code=404, detail="Сначала загрузите квитанцию оплаты !")
+
+        if request.payment_type_id == UUID("eda54dd2-2eef-430e-ae4e-0c4d68a44298"):
+            if request.to_transfer is False:
+                body_dict.pop("status", None)
+                raise HTTPException(status_code=404, detail="Сначала отправьте в переводы !")
             if request.invoice is None:
                 body_dict.pop("status", None)
                 raise HTTPException(status_code=404, detail="Сначала загрузите квитанцию оплаты !")

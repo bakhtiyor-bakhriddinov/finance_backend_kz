@@ -15,6 +15,7 @@ class Requests(Base):
     sap_code = Column(String)
     approved = Column(Boolean, default=False)
     to_accounting = Column(Boolean, default=False)
+    to_transfer = Column(Boolean, default=False)
     payment_time = Column(DateTime(timezone=True))
     payment_card = Column(String)
     currency = Column(String)
