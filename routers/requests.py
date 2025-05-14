@@ -299,7 +299,7 @@ async def update_request(
 
         request_sum = format(int(request.sum), ',').replace(',', ' ')
         if request.exchange_rate is not None:
-            requested_currency = format((request.sum / request.exchange_rate), ',').replace(',', ' ')
+            requested_currency = '{:,.2f}'.format((request.sum / request.exchange_rate), ',').replace(',', ' ')
         else:
             requested_currency = request_sum
 
