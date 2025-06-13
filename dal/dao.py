@@ -319,42 +319,43 @@ class BudgetDAO(BaseDAO):
 
     @classmethod
     async def get_filtered_budget_expense(cls, session: Session, department_id, expense_type_id, start_date: date, finish_date: date):
-        # current_year = float(current_date.year)
-        # current_month = float(current_date.month)
 
-        # result = session.query(
-        #     func.sum(Requests.sum)
-        # ).join(
-        #     Logs, Logs.request_id == Requests.id
-        # ).filter(
-        #     and_(
-        #         Requests.department_id == department_id,
-        #         Requests.expense_type_id == expense_type_id,
-        #         Requests.status != 4,
-        #         Requests.approved == True,
-        #         Logs.approved == True,
-        #         func.date(Logs.created_at).between(start_date, finish_date)
-        #         # func.date_part('year', Transactions.created_at) == current_year,
-        #         # func.date_part('month', Transactions.created_at) == current_month
-        #     )
-        # ).first()
+        if start_date == finish_date:
+            current_year = float(start_date.year)
+            current_month = float(start_date.month)
 
-        result = session.query(
-            func.sum(Transactions.value)
-        ).join(
-            Requests, Transactions.request_id == Requests.id
-        ).filter(
-            and_(
-                Requests.department_id == department_id,
-                Requests.expense_type_id == expense_type_id,
-                Transactions.status != 4,
-                Requests.status != 4,
-                Requests.approved == True,
-                func.date(Requests.payment_time).between(start_date, finish_date)
-                # func.date_part('year', Transactions.created_at) == current_year,
-                # func.date_part('month', Transactions.created_at) == current_month
-            )
-        ).first()
+            result = session.query(
+                func.sum(Transactions.value)
+            ).join(
+                Requests, Transactions.request_id == Requests.id
+            ).filter(
+                and_(
+                    Requests.department_id == department_id,
+                    Requests.expense_type_id == expense_type_id,
+                    Transactions.status != 4,
+                    Requests.status != 4,
+                    Requests.approved == True,
+                    # func.date(Requests.payment_time).between(start_date, finish_date)
+                    func.date_part('year', Requests.payment_time) == current_year,
+                    func.date_part('month', Requests.payment_time) == current_month
+                )
+            ).first()
+
+        else:
+            result = session.query(
+                func.sum(Transactions.value)
+            ).join(
+                Requests, Transactions.request_id == Requests.id
+            ).filter(
+                and_(
+                    Requests.department_id == department_id,
+                    Requests.expense_type_id == expense_type_id,
+                    Transactions.status != 4,
+                    Requests.status != 4,
+                    Requests.approved == True,
+                    func.date(Requests.payment_time).between(start_date, finish_date)
+                )
+            ).first()
 
         return result
 
