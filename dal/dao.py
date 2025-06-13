@@ -169,9 +169,9 @@ class DepartmentDAO(BaseDAO):
                     AND t.status = 6
                     AND r.status = 6 
                     AND r.payment_time::DATE BETWEEN :start_date AND :finish_date
-            
             ) AS budget_months
-            GROUP BY year, month, value_type, pending_requests
+            
+            GROUP BY year, month, value_type, pending_requests, delayed_requests
             ORDER BY year, month, value_type;
         """
         params = {
