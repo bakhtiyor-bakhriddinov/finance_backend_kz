@@ -32,6 +32,7 @@ class Requests(TunedModel):
     description: Optional[str] = None
     currency: Optional[str] = None
     exchange_rate: Optional[float] = None
+    payer_company: Optional[PayerCompanies] = None
 
 
 class Request(Requests):
@@ -40,7 +41,6 @@ class Request(Requests):
     to_accounting: Optional[bool] = None
     to_transfer: Optional[bool] = None
     approve_comment: Optional[str] = None
-    payer_company: Optional[PayerCompanies] = None
     contract: Optional[Contract] = None
     invoice: Optional[Invoice] = None
     logs: Optional[List[Log]] = None
