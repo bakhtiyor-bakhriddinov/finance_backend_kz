@@ -80,7 +80,7 @@ async def get_client(
                     finish_date=finish_date
                 )
             )[0]
-            expense = expense if expense is not None else 0
+            expense = -expense if expense is not None else 0
             department.balance = budget - expense
 
 

@@ -208,7 +208,7 @@ async def get_request(
                 finish_date=finish_date
             )
         )[0]
-        department_expense = department_expense if department_expense is not None else 0
+        department_expense = -department_expense if department_expense is not None else 0
         obj.department_budget = department_budget - department_expense - request_sum
 
     return obj
