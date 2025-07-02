@@ -1,3 +1,4 @@
+from datetime import date
 from typing import Optional, List
 from uuid import UUID
 
@@ -7,7 +8,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import Session
 
 from core.session import get_db
-from dal.dao import ClientDAO
+from dal.dao import ClientDAO, DepartmentDAO
 from schemas.clients import Clients, Client, UpdateClient, CreateClient
 from utils.utils import PermissionChecker
 
@@ -56,10 +57,22 @@ async def get_client_list(
 @clients_router.get("/clients/{id}", response_model=Client)
 async def get_client(
         id: UUID,
+        start_date: Optional[date] = None,
+        finish_date: Optional[date] = None,
         db: Session = Depends(get_db),
         current_user: dict = Depends(PermissionChecker(required_permissions={"Клиенты": ["read"]}))
 ):
     obj = await ClientDAO.get_by_attributes(session=db, filters={"id": id}, first=True)
+    if start_date is not None and finish_date is not None:
+        departments = obj.department
+        for department in departments:
+            budget = (
+                await DepartmentDAO.get_department_total_budget(
+                    session=db, department_id=department.id, start_date=start_date, finish_date=finish_date, payment_date=None
+                )
+            )[0]
+            department.total_budget = budget
+
     return obj
 
 
