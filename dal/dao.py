@@ -124,8 +124,8 @@ class DepartmentDAO(BaseDAO):
                     AND t.status = 0
                     AND r.status = 0 
                     AND r.approved IS False 
-                    AND EXTRACT(YEAR FROM r.payment_time::DATE) = EXTRACT(YEAR FROM budget_months.month_series)
-                    AND EXTRACT(MONTH FROM r.payment_time::DATE) = EXTRACT(MONTH FROM budget_months.month_series)
+                    AND EXTRACT(YEAR FROM r.created_at::DATE) = EXTRACT(YEAR FROM budget_months.month_series)
+                    AND EXTRACT(MONTH FROM r.created_at::DATE) = EXTRACT(MONTH FROM budget_months.month_series)
                 ) AS not_approved_requests
             
             FROM (
