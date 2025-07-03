@@ -49,5 +49,6 @@ class UpdateDepartment(TunedModel):
     id: UUID
     name: Optional[str] = None
     is_active: Optional[bool] = None
+    purchasable: Optional[bool] = None
     client_id: Optional[UUID] = None
     over_budget: Optional[bool] = None

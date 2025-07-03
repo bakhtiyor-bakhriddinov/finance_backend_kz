@@ -14,6 +14,7 @@ class Departments(Base):
     name = Column(String, nullable=False)
     is_active = Column(Boolean, default=True)
     over_budget = Column(Boolean, default=False)
+    purchasable = Column(Boolean, default=False)
     client_id = Column(UUID, ForeignKey("clients.id", ondelete="SET NULL"), nullable=True) # unique=True
     head = relationship('Clients', back_populates='department') # lazy="selectin"
     requests = relationship('Requests', back_populates='department', passive_deletes=True) # lazy='select'

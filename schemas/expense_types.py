@@ -27,3 +27,4 @@ class UpdateExpenseType(TunedModel):
     name: Optional[str] = None
     description: Optional[str] = None
     is_active: Optional[bool] = None
+    purchasable: Optional[bool] = None

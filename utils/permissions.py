@@ -82,7 +82,8 @@ permission_groups = {
         "accounting 2": "изменить заявки бухгалтерии",
         "transfer": "показать заявки для переводов",
         "statistics": "показать статистику",
-        "change_payment_type": "изменить тип оплаты"
+        "change_payment_type": "изменить тип оплаты",
+        "purchase requests": "показать заявки для закупа"
     },
     "Контракты": {
         "create": "создать договор",

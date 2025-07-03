@@ -33,7 +33,7 @@ async def get_accounting(
         approved: Optional[bool] = None,
         created_at: Optional[date] = None,
         payment_date: Optional[date] = None,
-        status: Optional[str] = "1,2,3,5",
+        status: Optional[str] = "1,2,3,5,6",
         db: Session = Depends(get_db),
         current_user: dict = Depends(PermissionChecker(required_permissions={"Заявки": ["accounting"]}))
 ):

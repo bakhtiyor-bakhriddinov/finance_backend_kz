@@ -39,6 +39,7 @@ class UpdateClient(TunedModel):
     phone: Optional[str] = None
     language: Optional[str] = None
     is_active: Optional[bool] = None
+    web_user: Optional[bool] = None
 
 
 class CreateClient(TunedModel):
