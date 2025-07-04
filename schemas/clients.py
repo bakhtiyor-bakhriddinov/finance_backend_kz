@@ -22,13 +22,13 @@ class Clients(TunedModel):
     is_active: Optional[bool]
     tg_id: Optional[int]
     web_user: Optional[bool] = None
+    department: Optional[List[ClientDepartments]] = None
     created_at: Optional[datetime]
 
 
 
 class Client(Clients):
     language: Optional[str]
-    department: Optional[List[ClientDepartments]] = None
     updated_at: Optional[datetime] = None
 
 
