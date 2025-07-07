@@ -19,9 +19,9 @@ purchase_router = APIRouter()
 async def get_purchase_requests(
         number: Optional[int] = None,
         client: Optional[str] = None,
-        department_id: Optional[UUID] = None,
+        # department_id: Optional[UUID] = None,
         supplier: Optional[str] = None,
-        expense_type_id: Optional[UUID] = None,
+        # expense_type_id: Optional[UUID] = None,
         payment_type_id: Optional[UUID] = None,
         payment_sum: Optional[float] = None,
         sap_code: Optional[str] = None,
@@ -34,13 +34,13 @@ async def get_purchase_requests(
 ):
     filters = {k: v for k, v in locals().items() if v is not None and k not in ["db", "current_user"]}
 
-    if department_id is None:
-        departments = await DepartmentDAO.get_by_attributes(session=db, filters={"purchasable": True})
-        filters["department_id"] = departments
+    # if department_id is None:
+    departments = await DepartmentDAO.get_by_attributes(session=db, filters={"purchasable": True})
+    filters["department_id"] = [department.id for department in departments]
 
-    if expense_type_id is None:
-        expense_types = await ExpenseTypeDAO.get_by_attributes(session=db, filters={"purchasable": True})
-        filters["expense_type_id"] = expense_types
+    # if expense_type_id is None:
+    expense_types = await ExpenseTypeDAO.get_by_attributes(session=db, filters={"purchasable": True})
+    filters["expense_type_id"] = [expense_type.id for expense_type in expense_types]
 
     if client is not None:
         # query = await ClientDAO.get_all(session=db, filters={"fullname": client})
