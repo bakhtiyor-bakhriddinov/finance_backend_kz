@@ -132,9 +132,9 @@ async def request_status_update():
             session.close()
 
     with get_session() as session:
-        print("\n--------- Started job working every time period ------------\n")
+        print("\n--------- Started request status updater job working every 30 minutes ------------\n")
         today = date.today()
-        today_query = await RequestDAO.get_all(session=session, filters={"status": [1], "payment_time": today})
+        today_query = await RequestDAO.get_all(session=session, filters={"status": [0, 1, 6], "payment_time": today})
         today_requests = session.execute(today_query).scalars().all()
         for request in today_requests:
             # time.sleep(1)
@@ -158,7 +158,7 @@ async def request_status_update():
 
         expired_requests = session.query(RequestDAO.model).filter(
             and_(
-                RequestDAO.model.status.in_([1, 2]),
+                RequestDAO.model.status.in_([0, 1, 2, 3, 6]),
                 func.date(RequestDAO.model.payment_time) < today
             )
         ).all()
@@ -190,7 +190,7 @@ async def status_updater():
     # trigger = CronTrigger(
     #     hour=11, minute=30, second=00, timezone=timezonetash
     # )
-    trigger = IntervalTrigger(minutes=5)
+    trigger = IntervalTrigger(minutes=30)
     job_scheduler.add_job(run_async_job, trigger=trigger, id='update_request_status')
 
 
