@@ -51,12 +51,15 @@ async def get_department_list(
         name: Optional[str] = None,
         start_date: Optional[date] = None,
         finish_date: Optional[date] = None,
+        purchasable: Optional[bool] = None,
         db: Session = Depends(get_db),
         current_user: dict = Depends(PermissionChecker(required_permissions={"Отделы": ["read", "accounting", "transfer"]}))
 ):
     filters = {}
     if name is not None:
         filters["name"] = name
+    if purchasable is not None:
+        filters["purchasable"] = purchasable
 
     departments = await DepartmentDAO.get_by_attributes(session=db, filters=filters if filters else None)
     user = await UserDAO.get_by_attributes(session=db, filters={"id": current_user["id"]}, first=True)
