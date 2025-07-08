@@ -32,12 +32,15 @@ async def create_expense_type(
 @expense_types_router.get("/expense-types", response_model=List[ExpenseTypes])
 async def get_expense_type_list(
         name: Optional[str] = None,
+        purchasable: Optional[bool] = None,
         db: Session = Depends(get_db),
-        current_user: dict = Depends(PermissionChecker(required_permissions={"Типы расходов": ["read", "accounting", "transfer"]}))
+        current_user: dict = Depends(PermissionChecker(required_permissions={"Типы расходов": ["read", "accounting", "transfer", "list"]}))
 ):
     filters = {}
     if name is not None:
         filters["name"] = name
+    if purchasable is not None:
+        filters["purchasable"] = purchasable
 
     objs = await ExpenseTypeDAO.get_by_attributes(session=db, filters=filters if filters else None)
     return objs
