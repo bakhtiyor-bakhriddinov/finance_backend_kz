@@ -36,13 +36,19 @@ async def login_client(
             except KeyError:
                 permissions[access.permission.group.name] = [access.permission.name]
 
+    clients = []
+
+    if user.clients:
+        for client in user.clients:
+            clients.append(client.id)
+
     user_info = {
         "id": str(user.id),
         "fullname": user.fullname,
         "username": user.username,
         "password": user.password,
         "permissions": permissions,
-        "client": user.clients if user.clients else None
+        "clients": clients
     }
     expire = datetime.now() + timedelta(minutes=settings.ACCESS_TOKEN_EXPIRE_MINUTES)
     data = {

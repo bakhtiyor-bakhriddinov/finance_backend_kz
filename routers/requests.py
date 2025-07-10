@@ -144,7 +144,7 @@ async def get_request_list(
     #     clients =
     #     filters["client_id"] = [client.id for client in clients]
 
-    print('CURRENT USER CLIENT: ', current_user.get("client", None), type(current_user.get("client", None)))
+    print('CURRENT USER CLIENT: ', current_user.get("clients", None), type(current_user.get("clients", None)))
 
     query = await RequestDAO.get_all(
         session=db,
