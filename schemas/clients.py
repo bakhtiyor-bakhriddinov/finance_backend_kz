@@ -5,6 +5,17 @@ from uuid import UUID
 from schemas.base_model import TunedModel
 
 
+
+class ClientUser(TunedModel):
+    id: UUID
+    username: str
+    tg_id: Optional[int] = None
+    fullname: Optional[str] = None
+    is_active: Optional[bool]
+    phone: Optional[str] = None
+    created_at: Optional[datetime]
+
+
 class ClientDepartments(TunedModel):
     id: Optional[UUID] = None
     name: Optional[str] = None
@@ -29,6 +40,7 @@ class Clients(TunedModel):
 
 class Client(Clients):
     language: Optional[str]
+    user: Optional[ClientUser] = None
     updated_at: Optional[datetime] = None
 
 
