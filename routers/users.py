@@ -40,7 +40,7 @@ async def login_client(
 
     if user.clients:
         for client in user.clients:
-            clients.append(client.id)
+            clients.append(str(client.id))
 
     user_info = {
         "id": str(user.id),
