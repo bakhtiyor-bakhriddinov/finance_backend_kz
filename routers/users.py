@@ -20,7 +20,7 @@ users_router = APIRouter()
 
 @users_router.post('/login-client')
 async def login_client(
-        form_data: LoginByPhone = Depends(),
+        form_data: LoginByPhone,
         session: Session= Depends(get_db)
 ):
     user = await UserDAO.get_by_attributes(session=session, filters={"phone": form_data.phone}, first=True)
