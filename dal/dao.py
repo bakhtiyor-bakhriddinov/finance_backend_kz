@@ -192,8 +192,6 @@ class DepartmentDAO(BaseDAO):
                     WHERE t.request_id IS NOT NULL 
                     AND r.department_id = :department_id 
                     AND r.approved IS False 
-                    AND EXTRACT(YEAR FROM r.created_at::DATE) = EXTRACT(YEAR FROM budget_months.month_series)
-                    AND EXTRACT(MONTH FROM r.created_at::DATE) = EXTRACT(MONTH FROM budget_months.month_series)
                 ) AS not_approved_requests
             
             FROM (
