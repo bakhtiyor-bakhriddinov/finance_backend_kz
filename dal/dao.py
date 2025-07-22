@@ -2,6 +2,7 @@ from datetime import timedelta, date
 from typing import Optional
 
 from sqlalchemy import func, and_, text, or_, case, select, literal_column, cast, Date
+from sqlalchemy.exc import SQLAlchemyError
 from sqlalchemy.orm import Session
 
 from dal.base import BaseDAO
@@ -192,6 +193,7 @@ class DepartmentDAO(BaseDAO):
                     WHERE t.request_id IS NOT NULL 
                     AND r.department_id = :department_id 
                     AND r.approved IS False 
+                    AND r.status IN (0,1,2,3)
                 ) AS not_approved_requests
             
             FROM (
@@ -310,13 +312,35 @@ class RequestDAO(BaseDAO):
     model = Requests
 
     @classmethod
+    async def sum_count_query(cls, session: Session, filters: dict = None):
+        # Get base filtered query from get_all()
+        base_query = await cls.get_all(session, filters)
+
+        subq = base_query.with_only_columns(
+            cls.model.id.label("id"),
+            cls.model.sum.label("sum")
+        ).subquery()
+
+        query = select(
+            func.count(subq.c.id).label("total_requests"),
+            func.sum(subq.c.sum).label("total_sum")
+        ).select_from(subq)
+
+        query = session.execute(query).first()
+
+        return {
+            "total_requests": query.total_requests or 0,
+            "total_sum": float(query.total_sum or 0)
+        }
+
+
+    @classmethod
     async def get_excel(cls, session: Session, filters):
 
         query = await cls.get_all(
             session=session,
             filters=filters if filters else None
         )
-        print("query all: ", query)
         query = query.join(
             Departments, cls.model.department_id == Departments.id
         ).join(
@@ -327,6 +351,66 @@ class RequestDAO(BaseDAO):
             PaymentTypes, cls.model.payment_type_id == PaymentTypes.id
         )
         return session.execute(query.order_by(cls.model.number.desc())).scalars().all()
+
+    @classmethod
+    async def get_financier_metrics(cls, session: Session, filters: dict = None):
+        try:
+            metrics = {}
+            # unpaid_filters = {k: v for k, v in (filters or {}).items() if k in ["approved", "status"]}
+            unpaid_filters = {"approved": True, "status": [0, 1, 2, 3]}
+            unpaid_requests = await cls.sum_count_query(session, unpaid_filters)
+            metrics["unpaid_requests"] = unpaid_requests
+
+            paid_filters = {"approved": True, "status": [5]}
+            paid_requests = await cls.sum_count_query(session, paid_filters)
+            metrics["paid_requests"] = paid_requests
+
+            department_filters = {k: v for k, v in (filters or {}).items() if k in ["start_date", "finish_date"]}
+            base_query = await cls.get_all(session, department_filters)
+            # Apply additional joins to the base query
+            join_query = base_query.join(Departments, cls.model.department_id == Departments.id)
+            # Subquery selecting required columns including department_name
+            subq = join_query.with_only_columns(
+                Departments.name.label("department_name"),
+                cls.model.id,
+                cls.model.sum,
+                cls.model.status
+            ).subquery()
+
+            # Replace the SELECT part with aggregates
+            department_requests = select(
+                subq.c.department_name,
+                func.count(subq.c.id).label("total_requests"),
+                func.sum(subq.c.sum).label("total_sum"),
+                func.sum(
+                    case((subq.c.status == 5, 1), else_=0)
+                ).label("paid_requests"),  # Number of requests with status = 5
+                (
+                    (func.sum(case((subq.c.status == 5, 1), else_=0)) / func.count(subq.c.id)) * 100
+                ).label("paid_requests_percent")
+            ).select_from(
+                subq
+            ).group_by(
+                subq.c.department_name
+            )
+            department_requests = session.execute(department_requests).all()
+            metrics["department_metrics"] = [
+                {
+                    "department_name": row.department_name,
+                    "total_requests": row.total_requests,
+                    "total_sum": float(row.total_sum or 0),
+                    "paid_requests": row.paid_requests,
+                    "paid_requests_percent": float(row.paid_requests_percent or 0)
+                }
+                for row in department_requests
+            ]
+
+            return metrics
+
+        except SQLAlchemyError as e:
+            print("SQLAlchemyError: \n", e)
+            return None
+
 
 
 class ContractDAO(BaseDAO):

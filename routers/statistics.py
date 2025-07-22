@@ -1,4 +1,5 @@
 from datetime import datetime, date
+from typing import Optional
 
 from fastapi import APIRouter, Depends
 from sqlalchemy import and_, func
@@ -57,3 +58,16 @@ async def get_statistics(
         "expense_statistics": expense_statistics[0][0],
     }
     return data
+
+
+@statistics_router.get("/financier-panel")
+async def get_metrics(
+        start_date: Optional[date] = None,
+        finish_date: Optional[date] = None,
+        db: Session = Depends(get_db),
+        current_user: dict = Depends(PermissionChecker(required_permissions={"Заявки": ["financier_panel"]}))
+):
+    filters = {k: v for k, v in locals().items() if v is not None and k not in ["db", "current_user"]}
+    metrics = await RequestDAO.get_financier_metrics(session=db, filters=filters or None)
+    return metrics
+

@@ -86,6 +86,7 @@ permission_groups = {
         "accounting 2": "изменить заявки бухгалтерии",
         "transfer": "показать заявки для переводов",
         "statistics": "показать статистику",
+        "financier_panel": "показать метрики финанс панеля",
         "change_payment_type": "изменить тип оплаты",
         "purchase requests": "показать заявки для закупа",
         "approve purchase": "одобрить заявку для закупа"
