@@ -389,12 +389,12 @@ class RequestDAO(BaseDAO):
         ).join(
             Departments, cls.model.department_id == Departments.id
         ).join(
-                Logs,
-                and_(
-                    cls.model.id == Logs.request_id,
-                    cls.model.status == Logs.status
-                )
+            Logs,
+            and_(
+                cls.model.id == Logs.request_id,
+                cls.model.status == Logs.status
             )
+        )
 
         # Subquery selecting required columns including department_name
         subq = (
@@ -519,6 +519,9 @@ class RequestDAO(BaseDAO):
             func.sum(
                 case((subq.c.status == 5, 1), else_=0)
             ).label("paid_requests"),  # Number of requests with status = 5
+            func.sum(
+                case((subq.c.status == 5, subq.c.sum), else_=0)
+            ).label("paid_requests_sum"),
             (
                     (func.sum(case((subq.c.status == 5, 1), else_=0)) / func.count(subq.c.id)) * 100
             ).label("paid_requests_percent")
@@ -602,6 +605,7 @@ class RequestDAO(BaseDAO):
                     "total_requests": row.total_requests,
                     "total_sum": float(row.total_sum or 0),
                     "paid_requests": row.paid_requests,
+                    "paid_requests_sum": row.paid_requests_sum,
                     "paid_requests_percent": float(row.paid_requests_percent or 0),
                     "monthly_expenses": department_expenses_result.get(row.department_name, {})
                 }
