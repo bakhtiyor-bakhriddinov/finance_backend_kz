@@ -378,81 +378,71 @@ class RequestDAO(BaseDAO):
 
     @classmethod
     async def department_monthly_expenses(cls, session: Session, filters: dict = None):
-        base_query = select(
-            cls.model
-        ).filter(
-            and_(
-                cls.model.approved == filters["approved"],
-                cls.model.status == filters["status"]
-                # func.date(Logs.created_at).between(filters["start_date"], filters["finish_date"])
-            )
-        ).join(
-            Departments, cls.model.department_id == Departments.id
-        ).join(
-            Logs,
-            and_(
-                cls.model.id == Logs.request_id,
-                cls.model.status == Logs.status
-            )
-        )
+        # Aliases
+        r = cls.model
+        d = Departments
+        l = Logs
 
-        # Subquery selecting required columns including department_name
-        subq = (
-            base_query
-            .with_only_columns(
-                Departments.name.label("department_name"),
-                cls.model.id.label("request_id"),
-                cls.model.sum.label("request_sum"),
-                cls.model.status.label("request_status"),
-                Logs.status.label("log_status"),
-                func.date(Logs.created_at).label("log_date")
+        # Subquery using DISTINCT ON to get the earliest log per request
+        base_query = (
+            select(
+                d.name.label("department_name"),
+                r.id.label("request_id"),
+                r.sum.label("request_sum"),
+                func.date(l.created_at).label("log_date")
             )
-            .group_by(
-                Departments.name,
-                cls.model.id,
-                cls.model.sum,
-                cls.model.status,
-                Logs.status,
-                func.date(Logs.created_at)
+            .join(d, r.department_id == d.id)
+            .join(l, and_(r.id == l.request_id, r.status == l.status))
+            .where(
+                r.approved == filters["approved"],
+                r.status == filters["status"]
             )
+            .distinct(r.id)
+            .order_by(r.id, l.created_at)
             .subquery()
         )
 
-        department_monthly_expenses = select(
-            subq.c.department_name.label("department"),
-            extract('year', subq.c.log_date).label('year'),
-            extract('month', subq.c.log_date).label('month'),
-            func.sum(distinct(subq.c.request_sum)).label("expense")
-        ).select_from(
-            subq
-        ).group_by(
-            subq.c.department_name,
-            extract('year', subq.c.log_date),
-            extract('month', subq.c.log_date)
-        ).order_by(
-            subq.c.department_name,
-            extract('year', subq.c.log_date).asc(),
-            extract('month', subq.c.log_date).asc()
+        # Per-department monthly expenses with total per month
+        department_monthly_expenses_stmt = (
+            select(
+                base_query.c.department_name.label("department"),
+                extract('year', base_query.c.log_date).label("year"),
+                extract('month', base_query.c.log_date).label("month"),
+                func.sum(base_query.c.request_sum).label("expense")
+            )
+            .group_by(
+                base_query.c.department_name,
+                extract('year', base_query.c.log_date),
+                extract('month', base_query.c.log_date)
+            )
+            .order_by(
+                base_query.c.department_name,
+                extract('year', base_query.c.log_date).asc(),
+                extract('month', base_query.c.log_date).asc()
+            )
         )
-        department_monthly_expenses = session.execute(department_monthly_expenses).all()
+        department_monthly_expenses = session.execute(department_monthly_expenses_stmt).all()
 
-        monthly_expenses = select(
-            extract('year', subq.c.log_date).label('year'),
-            extract('month', subq.c.log_date).label('month'),
-            func.sum(distinct(subq.c.request_sum)).label("expense")
-        ).select_from(
-            subq
-        ).group_by(
-            extract('year', subq.c.log_date),
-            extract('month', subq.c.log_date)
-        ).order_by(
-            extract('year', subq.c.log_date).asc(),
-            extract('month', subq.c.log_date).asc()
+        # Global (all departments) monthly expenses
+        monthly_expenses_stmt = (
+            select(
+                extract('year', base_query.c.log_date).label("year"),
+                extract('month', base_query.c.log_date).label("month"),
+                func.sum(base_query.c.request_sum).label("expense")
+            )
+            .group_by(
+                extract('year', base_query.c.log_date),
+                extract('month', base_query.c.log_date)
+            )
+            .order_by(
+                extract('year', base_query.c.log_date).asc(),
+                extract('month', base_query.c.log_date).asc()
+            )
         )
-        monthly_expenses = session.execute(monthly_expenses).all()
-
+        monthly_expenses = session.execute(monthly_expenses_stmt).all()
 
         return department_monthly_expenses, monthly_expenses
+
 
     @classmethod
     async def metrics_by_currency(cls, session: Session, filters: dict = None):
