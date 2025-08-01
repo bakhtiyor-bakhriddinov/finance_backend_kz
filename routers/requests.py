@@ -54,6 +54,7 @@ async def create_request(
     await LogDAO.add(
         session=db,
         **{
+            "sum": created_request.sum,
             "status": 0,
             "request_id": created_request.id,
             "user_id": current_user["id"]
