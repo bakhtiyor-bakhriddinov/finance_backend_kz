@@ -9,7 +9,7 @@ from requests import session
 from sqlalchemy.orm import Session
 
 from core.session import get_db
-from dal.dao import TransactionDAO, DepartmentDAO
+from dal.dao import TransactionDAO, DepartmentDAO, LogDAO
 from schemas.transactions import Transaction, CreateTransaction, Transactions, DepartmentTransactions
 from utils.utils import PermissionChecker
 
@@ -63,6 +63,12 @@ async def get_department_transaction_list(
     for transaction in transactions:
         if transaction.budget is not None:
             transaction.currency = "Сум"
+
+        if transaction.request.logs:
+            sum_logs = await LogDAO.get_request_logs_with_sum(session=db, request_id=transaction.request.id)
+            transaction.request.logs = [log for log in sum_logs]
+
+
 
     total_transactions = await TransactionDAO.get_department_all_transactions(
         session=db,

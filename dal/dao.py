@@ -702,6 +702,20 @@ class FileDAO(BaseDAO):
 class LogDAO(BaseDAO):
     model = Logs
 
+    @classmethod
+    async def get_request_logs_with_sum(cls, session: Session, request_id):
+        result = session.query(
+            cls.model
+        ).filter(
+            and_(
+                cls.model.request_id == request_id,
+                cls.model.sum.isnot(None)
+            )
+        ).order_by(
+            cls.model.created_at.desc()
+        ).all()
+        return result
+
 
 class LimitDAO(BaseDAO):
     model = Limits
