@@ -90,6 +90,7 @@ async def get_request_list(
         payment_sum: Optional[float] = None,
         sap_code: Optional[str] = None,
         approved: Optional[bool] = None,
+        credit: Optional[bool] = None,
         created_at: Optional[date] = None,
         start_date: Optional[date] = None,
         finish_date: Optional[date] = None,
@@ -117,6 +118,8 @@ async def get_request_list(
         filters["sap_code"] = sap_code
     if approved is not None:
         filters["approved"] = approved
+    if credit is not None:
+        filters["credit"] = credit
     if created_at is not None:
         filters["created_at"] = created_at
     if payment_date is not None:

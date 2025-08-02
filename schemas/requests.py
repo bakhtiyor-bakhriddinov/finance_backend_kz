@@ -25,6 +25,7 @@ class Requests(TunedModel):
     sum: float = None
     sap_code: Optional[str] = None
     approved: Optional[bool] = None
+    credit: Optional[bool] = None
     purchase_approved: Optional[bool] = None
     created_at: Optional[datetime] = None
     payment_time: Optional[datetime] = None
