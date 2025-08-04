@@ -75,7 +75,8 @@ class BaseDAO:
                     column = getattr(cls.model, k, None)
 
                     if k == "start_date" or k == "finish_date":
-                        column = getattr(cls.model, "created_at", None)
+                        # column = getattr(cls.model, "created_at", None)
+                        column = getattr(cls.model, "payment_time", None)
 
                     if column is not None:
                         if k == "status":
