@@ -12,7 +12,7 @@ from sqlalchemy.orm import Session
 from core.config import settings
 from core.session import get_db
 from dal.dao import RequestDAO, InvoiceDAO, ContractDAO, FileDAO, LogDAO, TransactionDAO, UserDAO, ClientDAO, BudgetDAO, \
-    DepartmentDAO
+    DepartmentDAO, ExpenseTypeDAO
 from schemas.requests import Requests, Request, UpdateRequest, CreateRequest, GenerateExcel
 from utils.utils import PermissionChecker, send_telegram_message, send_telegram_document, error_sender, excel_generator
 
@@ -38,6 +38,12 @@ async def create_request(
 
     if not body_dict.get("status"):
         body_dict["status"] = 0
+
+    if not body_dict.get("purchase_approved"):
+        department = await DepartmentDAO.get_by_attributes(session=db, filters={"id": body.department_id}, first=True)
+        expense_type = await ExpenseTypeDAO.get_by_attributes(session=db, filters={"id": body.expense_type_id}, first=True)
+        if department.purchasable is True and expense_type.purchasable is True:
+            body_dict["purchase_approved"] = False
 
     created_request = await RequestDAO.add(session=db, **body_dict)
 
