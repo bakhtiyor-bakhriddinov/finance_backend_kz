@@ -243,7 +243,7 @@ async def get_request(
 async def update_request(
         body: UpdateRequest,
         db: Session = Depends(get_db),
-        current_user: dict = Depends(PermissionChecker(required_permissions={"Заявки": ["update", "accounting 2"]}))
+        current_user: dict = Depends(PermissionChecker(required_permissions={"Заявки": ["update", "accounting 2", "edit_purchase_request"]}))
 ):
     body_dict = body.model_dump(exclude_unset=True)
     body_dict.pop("file_paths", None)
