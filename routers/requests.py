@@ -182,7 +182,7 @@ async def get_request(
         start_date: Optional[date] = None,
         finish_date: Optional[date] = None,
         db: Session = Depends(get_db),
-            current_user: dict = Depends(PermissionChecker(required_permissions={"Заявки": ["read", "accounting", "transfer", "purchase requests"]}))
+        current_user: dict = Depends(PermissionChecker(required_permissions={"Заявки": ["read", "accounting", "transfer", "purchase requests"]}))
 ):
     obj = await RequestDAO.get_by_attributes(session=db, filters={"id": id}, first=True)
     if obj.exchange_rate is not None:
@@ -389,9 +389,6 @@ async def update_request(
         if body_dict.get("sum"):
             data["value"] = body_dict.get("sum")
 
-        if body_dict.get("purchase_approved"):
-            data["purchase_approved"] = body_dict.get("purchase_approved")
-
         await TransactionDAO.update(session=db, data=data)
 
     db.commit()
@@ -423,6 +420,23 @@ async def update_request(
             }
         )
 
+        db.commit()
+        db.refresh(updated_request)
+
+    if body.purchase_approved is True:
+        insert_data = {
+            "request_id": updated_request.id,
+            "purchase_approved": updated_request.purchase_approved,
+        }
+        if body.client_id is not None:
+            insert_data["client_id"] = body.client_id
+        else:
+            insert_data["user_id"] = current_user["id"]
+
+        await LogDAO.add(
+            session=db,
+            **insert_data
+        )
         db.commit()
         db.refresh(updated_request)
 

@@ -148,6 +148,7 @@ class BaseDAO:
             return instance
 
         except SQLAlchemyError as e:
+            print("cls model error: ", cls.model)
             session.rollback()
             print("SQLAlchemyError: \n", e)
             return None
