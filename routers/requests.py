@@ -184,6 +184,11 @@ async def get_request(
     else:
         obj.currency_sum = obj.sum
 
+    if obj.receipt:
+        obj.advance_payment = False
+    else:
+        obj.advance_payment = True
+
     if obj.payment_time is not None:
         payment_date = obj.payment_time.date()
         department_id = obj.department_id
