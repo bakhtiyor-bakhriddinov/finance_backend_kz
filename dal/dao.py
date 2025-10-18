@@ -30,7 +30,6 @@ from models.suppliers import Suppliers
 from models.transactions import Transactions
 from models.users import Users
 from models.limits import Limits
-from models.role_expensetype_relations import RoleExpenseTypes
 
 
 class PermissionGroupDAO(BaseDAO):
