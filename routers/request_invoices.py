@@ -28,7 +28,6 @@ async def get_requests_with_invoices(
         payment_sum: Optional[float] = None,
         sap_code: Optional[str] = None,
         purchase_approved: Optional[bool] = None,
-        checked_by_financier: bool = False,
         created_at: Optional[date] = None,
         payment_date: Optional[date] = None,
         status: Optional[str] = "0,1,2,3,4,5,6",
@@ -39,6 +38,7 @@ async def get_requests_with_invoices(
 
     if client is not None:
         clients = await ClientDAO.get_by_attributes(session=db, filters={"fullname": client})
+        filters.pop("client", None)
         filters["client_id"] = [client.id for client in clients]
 
     query = await RequestDAO.get_all(
