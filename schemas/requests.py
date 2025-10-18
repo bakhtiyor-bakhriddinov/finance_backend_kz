@@ -38,6 +38,7 @@ class Requests(TunedModel):
     currency: Optional[str] = None
     exchange_rate: Optional[float] = None
     payer_company: Optional[PayerCompanies] = None
+    contract_number: Optional[str] = None
 
 
 class Request(Requests):
@@ -53,7 +54,6 @@ class Request(Requests):
     updated_at: Optional[datetime] = None
     expense_type_budget: Optional[float] = 0.0
     department_budget: Optional[float] = 0.0
-    contract_number: Optional[str] = None
     invoice_sap_code: Optional[str] = None
 
 
