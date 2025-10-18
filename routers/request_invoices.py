@@ -33,7 +33,7 @@ async def get_requests_with_invoices(
         payment_date: Optional[date] = None,
         status: Optional[str] = "0,1,2,3,4,5,6",
         db: Session = Depends(get_db),
-        current_user: dict = Depends(PermissionChecker(required_permissions={"Заявки": ["checkable requests"]}))
+        current_user: dict = Depends(PermissionChecker(required_permissions={"Заявки": ["requests_with_receipts"]}))
 ):
     filters = {k: v for k, v in locals().items() if v is not None and k not in ["db", "current_user"]}
 
