@@ -11,8 +11,19 @@ from sqlalchemy.orm import Session
 
 from core.config import settings
 from core.session import get_db
-from dal.dao import RequestDAO, InvoiceDAO, ContractDAO, FileDAO, LogDAO, TransactionDAO, UserDAO, ClientDAO, BudgetDAO, \
-    DepartmentDAO, ExpenseTypeDAO
+from dal.dao import (
+    RequestDAO,
+    InvoiceDAO,
+    ContractDAO,
+    FileDAO,
+    LogDAO,
+    TransactionDAO,
+    UserDAO,
+    ClientDAO,
+    BudgetDAO,
+    DepartmentDAO,
+    ExpenseTypeDAO
+)
 from schemas.requests import Requests, Request, UpdateRequest, CreateRequest, GenerateExcel
 from utils.utils import PermissionChecker, send_telegram_message, send_telegram_document, error_sender, excel_generator
 
@@ -44,6 +55,11 @@ async def create_request(
         expense_type = await ExpenseTypeDAO.get_by_attributes(session=db, filters={"id": body.expense_type_id}, first=True)
         if department.purchasable is True and expense_type.purchasable is True:
             body_dict["purchase_approved"] = False
+
+    if not body_dict.get("checked_by_financier"):
+        expense_type = await ExpenseTypeDAO.get_by_attributes(session=db, filters={"id": body.expense_type_id}, first=True)
+        if expense_type.checkable is True:
+            body_dict["checked_by_financier"] = False
 
     created_request = await RequestDAO.add(session=db, **body_dict)
 
@@ -105,48 +121,7 @@ async def get_request_list(
         db: Session = Depends(get_db),
         current_user: dict = Depends(PermissionChecker(required_permissions={"Заявки": ["read"]}))
 ):
-    filters = {}
-    if number is not None:
-        filters["number"] = number
-    if client_id is not None:
-        filters["client_id"] = client_id
-    if department_id is not None:
-        filters["department_id"] = department_id
-    if supplier is not None:
-        filters["supplier"] = supplier
-    if expense_type_id is not None:
-        filters["expense_type_id"] = expense_type_id
-    if payment_type_id is not None:
-        filters["payment_type_id"] = payment_type_id
-    if payment_sum is not None:
-        filters["sum"] = payment_sum
-    if sap_code is not None:
-        filters["sap_code"] = sap_code
-    if approved is not None:
-        filters["approved"] = approved
-    if credit is not None:
-        filters["credit"] = credit
-    if created_at is not None:
-        filters["created_at"] = created_at
-    if payment_date is not None:
-        filters["payment_time"] = payment_date
-    if status is not None:
-        filters["status"] = status
-
-    # data = {
-    #     "number": number,
-    #     "client_id": client_id,
-    #     "department_id": department_id,
-    #     "expense_type_id": expense_type_id,
-    #     "payment_type_id": payment_type_id,
-    #     "sum": payment_sum,
-    #     "sap_code": sap_code,
-    #     "approved": approved,
-    #     "created_at": created_at,
-    #     "payment_time": payment_date,
-    #     "status": status
-    # }
-    # filtered_data = {k: v for k, v in data.items() if v is not None}
+    filters = {k: v for k, v in locals().items() if v is not None and k not in ["db", "current_user"]}
 
     if client is not None:
         query = await ClientDAO.get_all(session=db, filters={"fullname": client})
@@ -161,6 +136,12 @@ async def get_request_list(
 
     if current_user.get("clients", None):
         filters["client_id"] = current_user.get("clients")
+
+    # role_expense_types = await RoleExpenseTypeDAO.get_by_attributes(session=db, filters={"role_id": current_user.get("role_id")})
+    # if role_expense_types:
+    #     expense_type_ids = [expense_type.expense_type_id for expense_type in role_expense_types]
+    #     filters["expense_type_id"] = expense_type_ids
+
 
     query = await RequestDAO.get_all(
         session=db,
@@ -243,7 +224,13 @@ async def get_request(
 async def update_request(
         body: UpdateRequest,
         db: Session = Depends(get_db),
-        current_user: dict = Depends(PermissionChecker(required_permissions={"Заявки": ["update", "accounting 2", "edit_purchase_request"]}))
+        current_user: dict = Depends(
+            PermissionChecker(
+                required_permissions={
+                    "Заявки": ["update", "accounting 2", "edit_purchase_request", "check"]
+                }
+            )
+        )
 ):
     body_dict = body.model_dump(exclude_unset=True)
     body_dict.pop("file_paths", None)
@@ -303,6 +290,11 @@ async def update_request(
         if "approve purchase" not in current_user["permissions"]["Заявки"]:
             body_dict.pop("purchase_approved", None)
             raise HTTPException(status_code=404, detail="У вас нет прав одобрить заявку для закупа !")
+
+    if body.checked_by_financier is True:
+        if "check" not in current_user["permissions"]["Заявки"]:
+            body_dict.pop("checked_by_financier", None)
+            raise HTTPException(status_code=404, detail="У вас нет прав проверить заявку как финансист !")
 
     if body.credit is True:
         if "credit" not in current_user["permissions"]["Заявки"]:

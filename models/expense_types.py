@@ -14,8 +14,10 @@ class ExpenseTypes(Base):
     description = Column(String)
     is_active = Column(Boolean, default=True)
     purchasable = Column(Boolean, default=False)
+    checkable = Column(Boolean, default=False)
     requests = relationship('Requests', back_populates='expense_type', passive_deletes=True) # lazy='select'
     budgets = relationship('Budgets', back_populates='expense_type')
+    # roles = relationship('RoleExpenseTypes', back_populates='expense_type')
     created_at = Column(DateTime(timezone=True), default=func.now())
     updated_at = Column(DateTime(timezone=True), onupdate=func.now())
 

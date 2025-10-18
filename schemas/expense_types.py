@@ -10,6 +10,7 @@ class ExpenseTypes(TunedModel):
     name: str
     is_active: Optional[bool]
     purchasable: Optional[bool] = None
+    checkable: Optional[bool] = None
     created_at: Optional[datetime]
 
 
@@ -29,3 +30,4 @@ class UpdateExpenseType(TunedModel):
     description: Optional[str] = None
     is_active: Optional[bool] = None
     purchasable: Optional[bool] = None
+    checkable: Optional[bool] = None

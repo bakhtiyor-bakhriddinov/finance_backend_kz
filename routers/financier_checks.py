@@ -15,8 +15,8 @@ purchase_router = APIRouter()
 
 
 
-@purchase_router.get("/purchase", response_model=Page[Requests])
-async def get_purchase_requests(
+@purchase_router.get("/financier-checks", response_model=Page[Requests])
+async def get_unchecked_requests(
         number: Optional[int] = None,
         client: Optional[str] = None,
         department_id: Optional[UUID] = None,
@@ -25,31 +25,21 @@ async def get_purchase_requests(
         payment_type_id: Optional[UUID] = None,
         payment_sum: Optional[float] = None,
         sap_code: Optional[str] = None,
-        # purchase_approved: Optional[bool] = None,
-        purchase_approved: bool = False,
+        purchase_approved: Optional[bool] = None,
+        checked_by_financier: bool = False,
         created_at: Optional[date] = None,
         payment_date: Optional[date] = None,
         status: Optional[str] = "0,1,2,3,4,5,6",
         db: Session = Depends(get_db),
-        current_user: dict = Depends(PermissionChecker(required_permissions={"Заявки": ["purchase requests"]}))
+        current_user: dict = Depends(PermissionChecker(required_permissions={"Заявки": ["checkable requests"]}))
 ):
     filters = {k: v for k, v in locals().items() if v is not None and k not in ["db", "current_user"]}
-    if "approve purchase" not in current_user["permissions"]["Заявки"]:
-        filters["status"] = "0,1,2,3,4,5,6,7"
-        filters["user_id"] = UUID(current_user["id"])
-
-    if department_id is None:
-        departments = await DepartmentDAO.get_by_attributes(session=db, filters={"purchasable": True})
-        filters["department_id"] = [department.id for department in departments]
 
     if expense_type_id is None:
-        expense_types = await ExpenseTypeDAO.get_by_attributes(session=db, filters={"purchasable": True})
+        expense_types = await ExpenseTypeDAO.get_by_attributes(session=db, filters={"checkable": True})
         filters["expense_type_id"] = [expense_type.id for expense_type in expense_types]
 
     if client is not None:
-        # query = await ClientDAO.get_all(session=db, filters={"fullname": client})
-        # clients = db.execute(query).scalars().all()
-        # filters["client_id"] = [client.id for client in clients]
         clients = await ClientDAO.get_by_attributes(session=db, filters={"fullname": client})
         filters["client_id"] = [client.id for client in clients]
 

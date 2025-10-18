@@ -27,6 +27,7 @@ class Requests(TunedModel):
     approved: Optional[bool] = None
     credit: Optional[bool] = None
     purchase_approved: Optional[bool] = None
+    checked_by_financier: Optional[bool] = None
     created_at: Optional[datetime] = None
     payment_time: Optional[datetime] = None
     status: Optional[int] = None
@@ -51,6 +52,8 @@ class Request(Requests):
     updated_at: Optional[datetime] = None
     expense_type_budget: Optional[float] = 0.0
     department_budget: Optional[float] = 0.0
+    contract_number: Optional[str] = None
+    invoice_sap_code: Optional[str] = None
 
 
 class CreateRequest(TunedModel):
@@ -76,6 +79,8 @@ class CreateRequest(TunedModel):
     sap_code: Optional[str] = None
     contract: Optional[bool] = None
     purchase_approved: Optional[bool] = None
+    checked_by_financier: Optional[bool] = None
+    contract_number: Optional[str] = None
     file_paths: List[str] = None
 
 
@@ -87,6 +92,7 @@ class UpdateRequest(TunedModel):
     approved: Optional[bool] = None
     credit: Optional[bool] = None
     purchase_approved: Optional[bool] = None
+    checked_by_financier: Optional[bool] = None
     to_accounting: Optional[bool] = None
     to_transfer: Optional[bool] = None
     approve_comment: Optional[str] = None
@@ -105,6 +111,7 @@ class UpdateRequest(TunedModel):
     supplier: Optional[str] = None
     description: Optional[str] = None
     sap_code: Optional[str] = None
+    invoice_sap_code: Optional[str] = None
     department_id: Optional[UUID] = None
     expense_type_id: Optional[UUID] = None
 

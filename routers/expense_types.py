@@ -33,6 +33,7 @@ async def create_expense_type(
 async def get_expense_type_list(
         name: Optional[str] = None,
         purchasable: Optional[bool] = None,
+        checkable: Optional[bool] = None,
         db: Session = Depends(get_db),
         current_user: dict = Depends(PermissionChecker(required_permissions={"Типы расходов": ["read", "accounting", "transfer", "list"]}))
 ):
@@ -41,6 +42,8 @@ async def get_expense_type_list(
         filters["name"] = name
     if purchasable is not None:
         filters["purchasable"] = purchasable
+    if checkable is not None:
+        filters["checkable"] = checkable
 
     objs = await ExpenseTypeDAO.get_by_attributes(session=db, filters=filters if filters else None)
     return objs

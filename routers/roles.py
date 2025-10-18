@@ -62,16 +62,11 @@ async def get_role(
     role = await RoleDAO.get_by_attributes(session=db, filters={"id": id}, first=True)
     role.permissions = [access.permission for access in role.accesses]
 
-    role_department_relations = await RoleDepartmentDAO.get_by_attributes(session=db,
-                                                                          filters={"role_id": role.id})
-    role.departments = [relation.department for relation in role_department_relations]
-    # role_departments = [relation.department_id for relation in role_department_relations]
+    role_department_relations = await RoleDepartmentDAO.get_by_attributes(session=db, filters={"role_id": role.id})
 
-    # departments = await DepartmentDAO.get_by_attributes(session=db)
-    # departments = [department for department in departments if
-    #                department.id in role_departments] if role_departments else [department for department in
-    #                                                                             departments]
-    # role.departments = departments
+    role.departments = [relation.department for relation in role_department_relations]
+    # role.expense_types = [relation.expense_type for relation in role.expense_types]
+
 
     return role
 
@@ -94,10 +89,15 @@ async def update_role(
 ):
     permissions = body.permissions
     departments = body.departments
+    # accepted_expense_types_ids = body.expense_types
+
     body_dict = body.model_dump(exclude_unset=True)
     body_dict.pop("permissions", None)
     body_dict.pop("departments", None)
+    # body_dict.pop("expense_types", None)
+
     updated_role = await RoleDAO.update(session=db, data=body_dict)
+
     if permissions is not None:
         role_accesses = updated_role.accesses
         role_permissions = [access.permission_id for access in role_accesses]
@@ -132,9 +132,26 @@ async def update_role(
         db.commit()
         db.refresh(updated_role)
 
-    role_department_relations = await RoleDepartmentDAO.get_by_attributes(session=db,
-                                                                          filters={"role_id": updated_role.id})
+    # if accepted_expense_types_ids is not None:
+    #     role_expense_types_relations = updated_role.expense_types
+    #     role_expense_types_ids = [relation.expense_type_id for relation in role_expense_types_relations]
+    #
+    #     for expense_type_id in role_expense_types_ids:
+    #         if expense_type_id not in accepted_expense_types_ids:
+    #             await RoleExpenseTypeDAO.delete(session=db, filters={"expense_type_id": expense_type_id, "role_id": updated_role.id})
+    #
+    #     for expense_type_id in accepted_expense_types_ids:
+    #         if expense_type_id not in role_expense_types_ids:
+    #             data = {"expense_type_id": expense_type_id, "role_id": updated_role.id}
+    #             await RoleExpenseTypeDAO.add(session=db, **data)
+    #
+    #     db.commit()
+    #     db.refresh(updated_role)
+
+    role_department_relations = await RoleDepartmentDAO.get_by_attributes(session=db, filters={"role_id": updated_role.id})
     updated_role.departments = [relation.department for relation in role_department_relations]
+
+    # updated_role.expense_types = [relation.expense_type for relation in updated_role.expense_types]
 
     return updated_role
 
