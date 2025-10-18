@@ -28,6 +28,7 @@ class Requests(TunedModel):
     credit: Optional[bool] = None
     purchase_approved: Optional[bool] = None
     checked_by_financier: Optional[bool] = None
+    advance_payment: Optional[bool] = None
     created_at: Optional[datetime] = None
     payment_time: Optional[datetime] = None
     status: Optional[int] = None

@@ -62,13 +62,18 @@ async def get_requests_with_invoices(
             )
 
     if contract_number is None:
-        result = db.execute(
+        query = db.execute(
             query
             .filter(RequestDAO.model.contract_number.isnot(None))
-            .order_by(RequestDAO.model.number.desc())
-        ).scalars().all()
-    else:
-        result = db.execute(query.order_by(RequestDAO.model.number.desc())).scalars().all()
+        )
 
-    return paginate(result)
+    requests = db.execute(query.order_by(RequestDAO.model.number.desc())).scalars().all()
+
+    for request in requests:
+        if request.receipt:
+            request.advance_payment = False
+        else:
+            request.advance_payment = True
+
+    return paginate(requests)
 
