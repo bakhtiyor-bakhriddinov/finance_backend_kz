@@ -429,6 +429,7 @@ async def update_request(
         updating_requests = await RequestDAO.get_by_attributes(session=db, filters={"contract_number": body.contract_number})
         for request in updating_requests:
             if request.id != body.id:
+                body_dict_copy["id"] = request.id
                 await RequestDAO.update(session=db, data=body_dict_copy)
 
     updated_request = await RequestDAO.update(session=db, data=body_dict)
