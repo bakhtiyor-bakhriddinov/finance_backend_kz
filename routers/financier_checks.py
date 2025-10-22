@@ -26,7 +26,7 @@ async def get_unchecked_requests(
         payment_sum: Optional[float] = None,
         sap_code: Optional[str] = None,
         purchase_approved: Optional[bool] = None,
-        # checked_by_financier: bool = False,
+        checked_by_financier: bool = False,
         created_at: Optional[date] = None,
         payment_date: Optional[date] = None,
         status: Optional[str] = "0,1,2,3,4,5,6",

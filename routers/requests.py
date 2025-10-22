@@ -314,7 +314,8 @@ async def update_request(
             body_dict.pop("purchase_approved", None)
             raise HTTPException(status_code=404, detail="У вас нет прав одобрить заявку для закупа !")
 
-    if body.status is not None and request.expense_type.checkable is True:
+    # if body.status is not None and request.expense_type.checkable is True:
+    if body.status is not None and request.checked_by_financier is False:
         body_dict.pop("status", None)
         raise HTTPException(status_code=404, detail="Данную заявку должен сперва проверить ответственный финансист !")
 
