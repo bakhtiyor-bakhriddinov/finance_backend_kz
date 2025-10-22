@@ -176,7 +176,7 @@ async def get_request(
         start_date: Optional[date] = None,
         finish_date: Optional[date] = None,
         db: Session = Depends(get_db),
-        current_user: dict = Depends(PermissionChecker(required_permissions={"Заявки": ["read", "accounting", "transfer", "purchase requests"]}))
+        current_user: dict = Depends(PermissionChecker(required_permissions={"Заявки": ["read one", "read", "accounting", "transfer", "purchase requests"]}))
 ):
     obj = await RequestDAO.get_by_attributes(session=db, filters={"id": id}, first=True)
     if obj.exchange_rate is not None:
