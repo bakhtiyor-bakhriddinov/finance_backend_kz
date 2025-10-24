@@ -245,7 +245,13 @@ async def update_request(
         current_user: dict = Depends(
             PermissionChecker(
                 required_permissions={
-                    "Заявки": ["update", "accounting 2", "edit_purchase_request", "check"]
+                    "Заявки": [
+                        "update",
+                        "accounting 2",
+                        "edit_purchase_request",
+                        "check",
+                        "set_receipt_sap_code"
+                    ]
                 }
             )
         )
