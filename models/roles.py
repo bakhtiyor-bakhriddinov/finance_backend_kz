@@ -21,7 +21,7 @@ class Roles(Base):
     updated_at = Column(DateTime(timezone=True), onupdate=func.now())
 
     @property
-    def expense_types_list(self):
+    def expense_types(self):
         return [rel.expense_type for rel in self.expense_types]
 
     @property
