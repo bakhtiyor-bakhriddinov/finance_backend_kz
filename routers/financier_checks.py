@@ -38,7 +38,7 @@ async def get_unchecked_requests(
     # if expense_type_id is None:
     #     expense_types = await ExpenseTypeDAO.get_by_attributes(session=db, filters={"checkable": True})
     #     filters["expense_type_id"] = [expense_type.id for expense_type in expense_types]
-
+    print("current_user role_id: ", current_user.get("role_id"))
     role_expense_types = await RoleExpenseTypeDAO.get_by_attributes(session=db, filters={"role_id": current_user.get("role_id")})
     print("role_expense_types: ", role_expense_types)
     if role_expense_types:
