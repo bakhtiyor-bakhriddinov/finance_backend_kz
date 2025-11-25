@@ -147,8 +147,8 @@ async def login(
 async def get_me(
         current_user: GetUser = Depends(get_me)
 ):
-    current_user.role.permissions = [access.permission for access in current_user.role.accesses]
-    current_user.role.departments = [relation.department for relation in current_user.role.roles_departments]
+    # current_user.role.permissions = [access.permission for access in current_user.role.accesses]
+    # current_user.role.departments = [relation.department for relation in current_user.role.roles_departments]
     return current_user
 
 
