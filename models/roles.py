@@ -25,10 +25,10 @@ class Roles(Base):
         return [rel.expense_type for rel in self.expense_types]
 
     @property
-    def departments_list(self):
+    def departments(self):
         return [rel.department for rel in self.roles_departments]
 
     @property
-    def permissions_list(self):
+    def permissions(self):
         return [rel.permission for rel in self.accesses]
 

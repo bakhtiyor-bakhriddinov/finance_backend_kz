@@ -32,12 +32,12 @@ class GetRole(GetRoles):
 
     departments: List[Departments] = Field(
         default_factory=list,
-        alias="departments_list",
+        alias="departments",
     )
 
     permissions: List[GetPermission] = Field(
         default_factory=list,
-        alias="permissions_list",
+        alias="permissions",
     )
 
     model_config = ConfigDict(from_attributes=True, populate_by_name=True)
