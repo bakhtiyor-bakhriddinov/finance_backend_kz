@@ -26,7 +26,7 @@ async def get_unchecked_requests(
         payment_sum: Optional[float] = None,
         sap_code: Optional[str] = None,
         purchase_approved: Optional[bool] = None,
-        # checked_by_financier: bool = False,
+        checked_by_financier: bool = False,
         created_at: Optional[date] = None,
         payment_date: Optional[date] = None,
         status: Optional[str] = "0,1,2,3,4,5,6",
@@ -38,9 +38,9 @@ async def get_unchecked_requests(
     # if expense_type_id is None:
     #     expense_types = await ExpenseTypeDAO.get_by_attributes(session=db, filters={"checkable": True})
     #     filters["expense_type_id"] = [expense_type.id for expense_type in expense_types]
-    print("current_user role_id: ", current_user.get("role_id"))
+
     role_expense_types = await RoleExpenseTypeDAO.get_by_attributes(session=db, filters={"role_id": current_user.get("role_id")})
-    print("role_expense_types: ", role_expense_types)
+
     if role_expense_types:
         expense_type_ids = [expense_type.expense_type_id for expense_type in role_expense_types]
         filters["expense_type_id"] = expense_type_ids
