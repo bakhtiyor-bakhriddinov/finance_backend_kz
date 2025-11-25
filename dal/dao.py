@@ -26,6 +26,7 @@ from models.permission_groups import PermissionGroups
 from models.permissions import Permissions
 from models.requests import Requests
 from models.role_department_relations import RoleDepartments
+from models.role_expensetype_relations import RoleExpenseTypes
 from models.roles import Roles
 from models.suppliers import Suppliers
 from models.transactions import Transactions
@@ -49,8 +50,8 @@ class RoleDepartmentDAO(BaseDAO):
     model = RoleDepartments
 
 
-# class RoleExpenseTypeDAO(BaseDAO):
-#     model = RoleExpenseTypes
+class RoleExpenseTypeDAO(BaseDAO):
+    model = RoleExpenseTypes
 
 
 class AccessDAO(BaseDAO):

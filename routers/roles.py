@@ -7,7 +7,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import Session
 
 from core.session import get_db
-from dal.dao import RoleDAO, AccessDAO, RoleDepartmentDAO, DepartmentDAO
+from dal.dao import RoleDAO, AccessDAO, RoleDepartmentDAO, DepartmentDAO, RoleExpenseTypeDAO
 from schemas.roles import GetRole, CreateRole, GetRoles, UpdateRole
 from utils.utils import PermissionChecker
 
@@ -23,9 +23,14 @@ async def create_role(
 ):
     permissions = body.permissions
     departments = body.departments
+    expense_types = body.expense_types
+
     body_dict = body.model_dump()
+
     body_dict.pop("permissions", None)
     body_dict.pop("departments", None)
+    body_dict.pop("expense_types", None)
+
     created_role = await RoleDAO.add(session=db, **body_dict)
     if permissions is not None:
         for permission in permissions:
@@ -48,6 +53,18 @@ async def create_role(
         role_department_relations = await RoleDepartmentDAO.get_by_attributes(session=db,
                                                                               filters={"role_id": created_role.id})
         created_role.departments = [relation.department for relation in role_department_relations]
+
+
+    if expense_types is not None:
+        for expense_type in expense_types:
+            data = {"expense_type_id": expense_type, "role_id": created_role.id}
+            await RoleExpenseTypeDAO.add(session=db, **data)
+
+        db.commit()
+        db.refresh(created_role)
+
+        role_expense_type_relations = await RoleExpenseTypeDAO.get_by_attributes(session=db, filters={"role_id": created_role.id})
+        created_role.expense_types = [relation.expense_type for relation in role_expense_type_relations]
 
     return created_role
 
@@ -89,12 +106,12 @@ async def update_role(
 ):
     permissions = body.permissions
     departments = body.departments
-    # accepted_expense_types_ids = body.expense_types
+    accepted_expense_types_ids = body.expense_types
 
     body_dict = body.model_dump(exclude_unset=True)
     body_dict.pop("permissions", None)
     body_dict.pop("departments", None)
-    # body_dict.pop("expense_types", None)
+    body_dict.pop("expense_types", None)
 
     updated_role = await RoleDAO.update(session=db, data=body_dict)
 
@@ -132,26 +149,25 @@ async def update_role(
         db.commit()
         db.refresh(updated_role)
 
-    # if accepted_expense_types_ids is not None:
-    #     role_expense_types_relations = updated_role.expense_types
-    #     role_expense_types_ids = [relation.expense_type_id for relation in role_expense_types_relations]
-    #
-    #     for expense_type_id in role_expense_types_ids:
-    #         if expense_type_id not in accepted_expense_types_ids:
-    #             await RoleExpenseTypeDAO.delete(session=db, filters={"expense_type_id": expense_type_id, "role_id": updated_role.id})
-    #
-    #     for expense_type_id in accepted_expense_types_ids:
-    #         if expense_type_id not in role_expense_types_ids:
-    #             data = {"expense_type_id": expense_type_id, "role_id": updated_role.id}
-    #             await RoleExpenseTypeDAO.add(session=db, **data)
-    #
-    #     db.commit()
-    #     db.refresh(updated_role)
+    if accepted_expense_types_ids is not None:
+        role_expense_types_relations = updated_role.expense_types
+        role_expense_types_ids = [relation.expense_type_id for relation in role_expense_types_relations]
+
+        for expense_type_id in role_expense_types_ids:
+            if expense_type_id not in accepted_expense_types_ids:
+                await RoleExpenseTypeDAO.delete(session=db, filters={"expense_type_id": expense_type_id, "role_id": updated_role.id})
+
+        for expense_type_id in accepted_expense_types_ids:
+            if expense_type_id not in role_expense_types_ids:
+                data = {"expense_type_id": expense_type_id, "role_id": updated_role.id}
+                await RoleExpenseTypeDAO.add(session=db, **data)
+
+        db.commit()
+        db.refresh(updated_role)
 
     role_department_relations = await RoleDepartmentDAO.get_by_attributes(session=db, filters={"role_id": updated_role.id})
     updated_role.departments = [relation.department for relation in role_department_relations]
-
-    # updated_role.expense_types = [relation.expense_type for relation in updated_role.expense_types]
+    updated_role.expense_types = [relation.expense_type for relation in updated_role.expense_types]
 
     return updated_role
 

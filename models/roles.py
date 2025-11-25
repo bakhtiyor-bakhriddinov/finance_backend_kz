@@ -16,7 +16,7 @@ class Roles(Base):
     accesses = relationship("Accesses", back_populates="role", cascade="all, delete")
     users = relationship('Users', back_populates='role', passive_deletes=True)
     roles_departments = relationship('RoleDepartments', back_populates='role')
-    # expense_types = relationship('RoleExpenseTypes', back_populates='role')
+    expense_types = relationship('RoleExpenseTypes', back_populates='role')
     created_at = Column(DateTime(timezone=True), default=func.now())
     updated_at = Column(DateTime(timezone=True), onupdate=func.now())
 

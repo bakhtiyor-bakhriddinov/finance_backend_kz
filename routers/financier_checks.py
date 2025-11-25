@@ -7,7 +7,7 @@ from fastapi_pagination import Page, paginate
 from sqlalchemy.orm import Session
 
 from core.session import get_db
-from dal.dao import RequestDAO, ClientDAO, DepartmentDAO, ExpenseTypeDAO
+from dal.dao import RequestDAO, ClientDAO, DepartmentDAO, ExpenseTypeDAO, RoleExpenseTypeDAO
 from schemas.requests import Requests
 from utils.utils import PermissionChecker
 
@@ -38,6 +38,11 @@ async def get_unchecked_requests(
     # if expense_type_id is None:
     #     expense_types = await ExpenseTypeDAO.get_by_attributes(session=db, filters={"checkable": True})
     #     filters["expense_type_id"] = [expense_type.id for expense_type in expense_types]
+
+    role_expense_types = await RoleExpenseTypeDAO.get_by_attributes(session=db, filters={"role_id": current_user.get("role_id")})
+    if role_expense_types:
+        expense_type_ids = [expense_type.expense_type_id for expense_type in role_expense_types]
+        filters["expense_type_id"] = expense_type_ids
 
     if client is not None:
         clients = await ClientDAO.get_by_attributes(session=db, filters={"fullname": client})

@@ -27,6 +27,7 @@ class CreateRole(TunedModel):
     description: Optional[str] = None
     permissions: Optional[List[UUID]] = None
     departments: Optional[List[UUID]] = None
+    expense_types: Optional[List[UUID]] = None
 
 
 
