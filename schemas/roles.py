@@ -22,9 +22,9 @@ class GetRole(GetRoles):
     # permissions: Optional[List[GetPermission]] = None
     # departments: Optional[List[Departments]] = None
     # expense_types: Optional[List[ExpenseTypes]] = None
-    expense_types: Optional[List[ExpenseTypes]] = Field(alias="expense_types_list") | []
-    departments: Optional[List[Departments]] = Field(alias="departments_list") | []
-    permissions: Optional[List[GetPermission]] = Field(alias="permissions_list") | []
+    expense_types: Optional[List[ExpenseTypes]] = Field(alias="expense_types_list")
+    departments: Optional[List[Departments]] = Field(alias="departments_list")
+    permissions: Optional[List[GetPermission]] = Field(alias="permissions_list")
 
     model_config = ConfigDict(from_attributes=True, populate_by_name=True)
 
