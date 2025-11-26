@@ -29,7 +29,8 @@ async def get_unchecked_requests(
         checked_by_financier: bool = False,
         created_at: Optional[date] = None,
         payment_date: Optional[date] = None,
-        status: Optional[str] = "0,1,2,3,4,5,6",
+        # status: Optional[str] = "0,1,2,3,4,5,6",
+        status: Optional[str] = "0",
         db: Session = Depends(get_db),
         current_user: dict = Depends(PermissionChecker(required_permissions={"Заявки": ["checkable requests"]}))
 ):
