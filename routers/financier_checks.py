@@ -42,7 +42,7 @@ async def get_unchecked_requests(
     role_expense_types = await RoleExpenseTypeDAO.get_by_attributes(session=db, filters={"role_id": current_user.get("role_id")})
 
     if role_expense_types:
-        expense_type_ids = [expense_type.expense_type_id for expense_type in role_expense_types]
+        expense_type_ids = [rel.expense_type_id for rel in role_expense_types if rel.expense_type.checkable is True]
         filters["expense_type_id"] = expense_type_ids
 
     if client is not None:
