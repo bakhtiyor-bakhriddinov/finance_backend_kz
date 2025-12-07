@@ -1,34 +1,56 @@
-name: Build WF
+name: FastAPi WF
 on: 
-    push:
-        branches:
-            - main
+  push:
+    branches:
+      - main
 
 jobs:
-    Build:
-        runs-on: ubuntu-latest
-        defaults:
-          run:
-            working-directory: ./finance_backend
-        steps: 
-            - name: Code checkout
-              uses: actions/checkout@v4
-            
-            - name: Maven build
-              run: mvn install
+  Build:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ./finance_backend
 
-    Testing:
-        runs-on: ubuntu-latest
-        defaults:
-          run:
-            working-directory: ./finance_backend
-        needs: Build
-        steps: 
-            - name: Code checkout
-              uses: actions/checkout@v4
-            
-            - name: Run tests on main branch
-              run: mvn test
-            
-            - name: Checkstyle
-              run: mvn checkstyle:checkstyle
+    steps: 
+      - name: Code checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: "3.11"
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+
+  Testing:
+    runs-on: ubuntu-latest
+    needs: Build
+    defaults:
+      run:
+        working-directory: ./finance_backend
+
+    steps: 
+      - name: Code checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: "3.11"
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      - name: Run pytest
+        run: pytest
+
+      - name: Lint with flake8
+        run: |
+          pip install flake8
+          flake8 .
