@@ -30,7 +30,6 @@ async def get_statistics(
     ).group_by(
         RequestDAO.model.status
     ).all()
-    # print("requests_statuses: ", requests_statuses)
 
     today_paying_requests = db.query(
         func.count(RequestDAO.model.id)
@@ -40,7 +39,6 @@ async def get_statistics(
             func.date(RequestDAO.model.payment_time) == datetime.now().date()
         )
     ).all()
-    # print("today_paying_requests: ", today_paying_requests)
 
     expense_statistics = db.query(
         coalesce(func.sum(RequestDAO.model.sum), 0)
@@ -50,7 +48,6 @@ async def get_statistics(
             RequestDAO.model.created_at.between(start_date, finish_date)
         )
     ).all()
-    # print("expense_statistics: ", expense_statistics)
 
     data = {
         "request_statuses": {status: count for status, count in requests_statuses},

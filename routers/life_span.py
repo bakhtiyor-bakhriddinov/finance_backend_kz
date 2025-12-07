@@ -118,7 +118,6 @@ async def create_role_lifespan():
                 }
             )
             session.commit()
-            # print("Created Admin user: ", user)
 
     yield  #--------------  HERE YOU CAN WRITE LOG ON CLOSING AFTER YIELD ------------
 
