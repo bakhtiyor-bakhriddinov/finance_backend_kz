@@ -102,9 +102,6 @@ async def get_budget_balance(
     if finish_date is not None:
         filters["finish_date"] = finish_date.replace(day=calendar.monthrange(finish_date.year, finish_date.month)[1])
 
-    print("filters: ", filters)
-    print("start_date: ", start_date, type(start_date))
-    print("finish_date: ", finish_date, type(finish_date))
     current_date = date.today()
     obj = await BudgetDAO.get_by_attributes(session=db, filters=filters, first=True)
     if not obj:
@@ -118,7 +115,6 @@ async def get_budget_balance(
         finish_date=current_date if finish_date is None else finish_date
     ))[0]
     budget = budget if budget is not None else 0
-    # print("budget: ", budget)
     expense = (await BudgetDAO.get_filtered_budget_expense(
         session=db,
         department_id=department_id,
@@ -126,7 +122,6 @@ async def get_budget_balance(
         start_date=current_date if start_date is None else start_date,
         finish_date=current_date if finish_date is None else finish_date
     ))[0]
-    # print("expense: ", expense)
     expense = -expense if expense is not None else 0
     obj.value = budget - expense
 

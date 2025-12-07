@@ -617,8 +617,6 @@ class RequestDAO(BaseDAO):
 
             department_expenses_filters = {"approved": True, "status": 5}
             department_expenses, monthly_expenses = await cls.department_monthly_expenses(session, department_expenses_filters)
-            # print("department_expenses: \n", department_expenses)
-            # print("monthly_expenses: \n", monthly_expenses)
 
             monthly_expenses_result_dict = defaultdict(
                 lambda: {

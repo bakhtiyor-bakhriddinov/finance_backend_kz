@@ -76,7 +76,6 @@ async def get_department_list(
             )
         )[0]
         department.total_budget = budget
-        # print("total_budget: ", budget)
 
     return paginate(departments)
 
@@ -110,8 +109,7 @@ async def get_department(
             }
         )
     )
-    # print("budget: ", budget)
-
+    
     for year, month, type, sum, pending_requests, delayed_requests, not_approved_requests in budget:
         result_dict[int(year)][int(month)][type] = -float(sum) if type in ["expense", "pending", "delayed"] else float(sum)
         result_dict[int(year)][int(month)]["balance"] = result_dict[int(year)][int(month)]["budget"] - result_dict[int(year)][int(month)]["expense"]
@@ -121,7 +119,6 @@ async def get_department(
 
     # Convert defaultdict to a list of dictionaries
     department.monthly_budget = [{year: dict(months)} for year, months in result_dict.items()]
-    # print(department.monthly_budget)
 
     return department
 
