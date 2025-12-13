@@ -101,7 +101,7 @@ permission_groups = {
         "financier_panel": "показать метрики финанс панеля",
         "change_payment_type": "изменить тип оплаты",
         "purchase requests": "показать заявки для закупа",
-        "checkable requests": "показать заявки для проверки",
+        # "checkable requests": "показать заявки для проверки",
         "requests_with_receipts": "показать заявки с счёт-фактурой",
         "set_receipt_sap_code": "установить sap код счёт-фактуры",
         "approve purchase": "одобрить заявку для закупа",

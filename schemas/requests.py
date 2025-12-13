@@ -23,7 +23,7 @@ class Requests(TunedModel):
     expense_type: Optional[ExpenseTypes] = None
     payment_type: Optional[PaymentTypes] = None
     sum: float = None
-    sap_code: Optional[str] = None
+    acceptance_number: Optional[str] = None
     approved: Optional[bool] = None
     credit: Optional[bool] = None
     purchase_approved: Optional[bool] = None
@@ -78,7 +78,7 @@ class CreateRequest(TunedModel):
     payer_company_id: Optional[UUID] = None
     cash: Optional[float] = None
     payment_card: Optional[str] = None
-    sap_code: Optional[str] = None
+    acceptance_number: Optional[str] = None
     contract: Optional[bool] = None
     purchase_approved: Optional[bool] = None
     checked_by_financier: Optional[bool] = None
@@ -113,7 +113,7 @@ class UpdateRequest(TunedModel):
     buyer: Optional[str] = None
     supplier: Optional[str] = None
     description: Optional[str] = None
-    sap_code: Optional[str] = None
+    acceptance_number: Optional[str] = None
     invoice_sap_code: Optional[str] = None
     contract_number: Optional[str] = None
     department_id: Optional[UUID] = None
@@ -142,7 +142,7 @@ class GenerateExcel(TunedModel):
     expense_type_id: Optional[UUID] = None
     payment_type_id: Optional[UUID] = None
     payment_sum: Optional[float] = None
-    sap_code: Optional[str] = None
+    acceptance_number: Optional[str] = None
     approved: Optional[bool] = None
     credit: Optional[bool] = None
     created_at: Optional[date] = None

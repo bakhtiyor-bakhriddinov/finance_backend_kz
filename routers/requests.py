@@ -122,7 +122,7 @@ async def get_request_list(
         expense_type_id: Optional[UUID] = None,
         payment_type_id: Optional[UUID] = None,
         payment_sum: Optional[float] = None,
-        sap_code: Optional[str] = None,
+        acceptance_number: Optional[str] = None,
         approved: Optional[bool] = None,
         credit: Optional[bool] = None,
         created_at: Optional[date] = None,
@@ -574,7 +574,7 @@ async def update_request(
         f"📈 Курс валюты: {request.exchange_rate if request.exchange_rate else ''}\n"
         f"💳 Тип оплаты: {request.payment_type.name}\n"
         f"💳 Карта перевода: {request.payment_card if request.payment_card is not None else ''}\n"
-        f"📜 № Заявки в SAP: {request.sap_code}\n"
+        f"📜 № Номер приходной: {request.acceptance_number}\n"
         f"🕓 Дата оплаты: {request.payment_time}\n"
         f"💸 Фирма-плательщик: {request.payer_company.name if request.payer_company is not None else ''}\n\n"
         f"📝 Комментарии: {request.description}\n\n"
