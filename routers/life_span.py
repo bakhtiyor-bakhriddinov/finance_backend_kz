@@ -87,8 +87,7 @@ async def create_role_lifespan():
             session.close()
 
     with get_session() as session:
-        # role = await RoleDAO.get_by_attributes(session=session, filters={"name": settings.admin_role, "description": 'Superuser'}, first=True)
-        role = await RoleDAO.get_by_attributes(session=session, filters={"id": "03664198-6b61-4694-8ea2-2aa965cdeb77"}, first=True)
+        role = await RoleDAO.get_by_attributes(session=session, filters={"name": settings.admin_role, "description": 'Superuser'}, first=True)
         if not role:
             role = await RoleDAO.add(session=session, **{"name": settings.admin_role, "description": 'Superuser'})
 

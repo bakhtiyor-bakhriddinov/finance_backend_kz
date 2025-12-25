@@ -266,7 +266,7 @@ def excel_generator(data):
     }
     for row in data:
         columns["Номер заявки"].append(row.number)
-        columns["Код заявки SAP"].append(row.sap_code)
+        columns["Номер приходной"].append(row.acceptance_number)
         columns["Дата запроса"].append(row.created_at.strftime("%d-%m-%Y"))
         columns["Отдел"].append(row.department.name)
         columns["Одобрено"].append(approved_data[row.approved])
